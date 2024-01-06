@@ -11,23 +11,20 @@ import burp.api.montoya.http.handler.ResponseReceivedAction;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.core.ByteArray;
 
-import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.util.JsonFormat;
-
-import java.util.List;
 
 public class AppHandler implements HttpHandler {
     private final MontoyaApi api;
     private final Logging logging;
     private final ProtobufModel pModel;
-    private final String protoDescPath = System.getProperty("user.dir")+ "/hello/hello.desc";
-	private final String messageTypeName = "HelloRequest";
+    private final String protoDescPath = System.getProperty("user.dir")+ "/workdir/src/protobuf/http-protobuf-helloworld/proto/hello.desc";
+	private final String messageTypeName = "PostUserRequest";
 
     public AppHandler(MontoyaApi api) {
         this.api = api;
         this.logging = api.logging();
-        this.pModel = new ProtobufModel(protoDescPath);
+        this.pModel = new ProtobufModel(protoDescPath, logging);
     }
 
     @Override

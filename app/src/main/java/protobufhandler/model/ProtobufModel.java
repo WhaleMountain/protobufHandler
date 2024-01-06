@@ -1,5 +1,8 @@
 package protobufhandler.model;
 
+import burp.api.montoya.logging.Logging;
+
+import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -9,21 +12,24 @@ import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
 public class ProtobufModel {
+    private final Logging logging;
     private final String protoDescPath;
     private List<Descriptor> messageTypes;
 
-    public ProtobufModel(String protoDescPath) {
+    public ProtobufModel(String protoDescPath, Logging logging) {
         this.protoDescPath = protoDescPath;
+        this.logging = logging;
         try {
             messageTypes = getMessageTypesFromProtoFile(protoDescPath);
         } catch(IOException | DescriptorValidationException e) { 
-            //TODO
+            //TODO: ファイルがない時どうする〜
         }
     }
 
@@ -45,26 +51,19 @@ public class ProtobufModel {
         return JsonFormat.printer().print(message);
     }
 
-    private List<Descriptor> getMessageTypesFromProtoFile(String protoFilePath) throws IOException, Descriptors.DescriptorValidationException {
-        // .protoファイルを読み込み、FileDescriptorSetに変換
-        FileDescriptorSet set = FileDescriptorSet.parseFrom(new FileInputStream(protoFilePath));
+    private List<Descriptor> getMessageTypesFromProtoFile(String protoDescPath) throws IOException, Descriptors.DescriptorValidationException {
+        FileInputStream protoFis = new FileInputStream(protoDescPath);
+        FileDescriptorSet set = FileDescriptorSet.parseFrom(new BufferedInputStream(protoFis));
+        protoFis.close();
 
-        // FileDescriptorSetからFileDescriptorを取得
-        FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(0), new FileDescriptor[] {});
+        ArrayList<FileDescriptor> dependenciesDescriptors = new ArrayList<FileDescriptor>();
+        for(int i = 0; i < set.getFileCount(); i++) {
+            FileDescriptor dependenciesDescriptor = FileDescriptor.buildFrom(set.getFile(i), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
+            dependenciesDescriptors.add(dependenciesDescriptor);
+        }
+
+        FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(set.getFileCount() - 1), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
 
         return fileDescriptor.getMessageTypes();
     }
-
-    /*public Descriptor getDescriptorFromProtoFile(String protoFilePath, String messageTypeName) throws IOException, Descriptors.DescriptorValidationException {
-        // .protoファイルを読み込み、FileDescriptorSetに変換
-        FileDescriptorSet set = FileDescriptorSet.parseFrom(new FileInputStream(protoFilePath));
-
-        // FileDescriptorSetからFileDescriptorを取得
-        FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(0), new FileDescriptor[] {});
-
-        // FileDescriptorから指定したメッセージ型のDescriptorを取得
-        Descriptor descriptor = fileDescriptor.findMessageTypeByName(messageTypeName);
-
-        return descriptor;
-    }*/
 }
