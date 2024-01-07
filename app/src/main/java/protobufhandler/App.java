@@ -6,18 +6,24 @@ package protobufhandler;
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.logging.Logging;
+import protobufhandler.view.MainView;
 
 //Burp will auto-detect and load any class that extends BurpExtension.
 public class App implements BurpExtension {
+    private final String extensionName = "Protobuf Handler";
+    private final String extensionVersion = "v0.0.1";
 
     @Override
     public void initialize(MontoyaApi api) {
         Logging logging = api.logging();
-        api.extension().setName("Protobuf Handler");
+        api.extension().setName(extensionName);
 
-        AppHandler handler = new AppHandler(api);
+        MainView view = new MainView(api);
+        api.userInterface().registerSuiteTab(extensionName, view.getUiComponent());
+
+        AppHandler handler = new AppHandler(api, view.getHandlingRules());
         api.http().registerHttpHandler(handler);
 
-        logging.logToOutput("Successfully loaded Protobuf Handler v0.0.1");
+        logging.logToOutput("Successfully loaded %s %s".formatted(extensionName, extensionVersion));
     }
 }
