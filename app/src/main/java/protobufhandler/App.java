@@ -24,6 +24,10 @@ public class App implements BurpExtension {
         AppHandler handler = new AppHandler(api, view.getHandlingRules());
         api.http().registerHttpHandler(handler);
 
+        AppEditorProvider editorProvider = new AppEditorProvider(api);
+        api.userInterface().registerHttpRequestEditorProvider(editorProvider.getRequestProvider());
+        api.userInterface().registerHttpResponseEditorProvider(editorProvider.getResponseProvider());
+
         logging.logToOutput("Successfully loaded %s %s".formatted(extensionName, extensionVersion));
     }
 }

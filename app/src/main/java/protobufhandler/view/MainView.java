@@ -253,7 +253,6 @@ public class MainView {
                 logging.logToOutput("File: " + selectedProtoPathLabel.getText());
             }
 
-
             itemModel.fireTableRowsUpdated(selectedRow, selectedRow);
         });
 
