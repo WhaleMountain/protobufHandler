@@ -18,12 +18,10 @@ import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Descriptors.Descriptor;
 
 public class AppHandler implements HttpHandler {
-    private final MontoyaApi api;
     private final Logging logging;
     private final List<AppModel> handlingRules;
 
     public AppHandler(MontoyaApi api, List<AppModel> rules) {
-        this.api = api;
         this.logging = api.logging();
         this.handlingRules = rules;
     }
