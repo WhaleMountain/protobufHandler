@@ -2,8 +2,6 @@ package protobufhandler.view.ui;
 
 import javax.swing.table.*;
 
-import com.google.protobuf.Descriptors.Descriptor;
-
 import protobufhandler.model.AppModel;
 
 import java.util.List;

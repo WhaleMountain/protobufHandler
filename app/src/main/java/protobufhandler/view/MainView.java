@@ -195,8 +195,10 @@ public class MainView {
                     for (Descriptor descriptor : descriptors) {
                         messageTypeComboBox.addItem(descriptor.getName());
                     }
+                    
                 } catch(Exception e) {
-                    //TODO
+                    logging.logToOutput("Protobuf file の読み込みに失敗しました。");
+                    logging.logToOutput("File: " + selectedPath);
                 }
 
                 selectedProtoPathLabel.setText(selectedPath);
@@ -247,7 +249,8 @@ public class MainView {
                 }
 
             } catch(Exception e) {
-                //TODO
+                logging.logToOutput("Protobuf file の読み込みに失敗しました。");
+                logging.logToOutput("File: " + selectedProtoPathLabel.getText());
             }
 
 
