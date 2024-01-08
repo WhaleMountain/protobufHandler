@@ -229,10 +229,28 @@ public class MainView {
             item.clearToolScope();
             item.clearCachedMessageType();
 
-            if(toolScopeRepeaterCheckBox.isSelected())   { item.setToolScope(ToolType.REPEATER.toolName());   }
-            if(toolScopeIntruderCheckBox.isSelected())   { item.setToolScope(ToolType.INTRUDER.toolName());   }
-            if(toolScopeScannerCheckBox.isSelected())    { item.setToolScope(ToolType.SCANNER.toolName());    }
-            if(toolScopeExtensionsCheckBox.isSelected()) { item.setToolScope(ToolType.EXTENSIONS.toolName()); }
+            if(toolScopeRepeaterCheckBox.isSelected()) {
+                item.setToolScope(ToolType.REPEATER.toolName());
+            } else {
+                item.removeToolScope(ToolType.REPEATER.toolName());
+            }
+
+            if(toolScopeIntruderCheckBox.isSelected()) {
+                item.setToolScope(ToolType.INTRUDER.toolName());
+            } else {
+                item.removeToolScope(ToolType.INTRUDER.toolName());
+            }
+            if(toolScopeScannerCheckBox.isSelected()) {
+                item.setToolScope(ToolType.SCANNER.toolName());
+            } else {
+                item.removeToolScope(ToolType.SCANNER.toolName());
+            }
+
+            if(toolScopeExtensionsCheckBox.isSelected()) {
+                item.setToolScope(ToolType.EXTENSIONS.toolName());
+            } else {
+                item.removeToolScope(ToolType.EXTENSIONS.toolName());
+            }
 
             item.setScope(scopeTextField.getText());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
