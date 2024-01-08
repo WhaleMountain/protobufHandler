@@ -2,6 +2,7 @@ package protobufhandler.view;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import java.awt.*;
 import javax.swing.*;
@@ -81,7 +82,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestEditor.getContents().getBytes());
+                builder.mergeFrom(requestResponse.response().bodyToString().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setContents(ByteArray.byteArray(json));
@@ -117,7 +118,23 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
     @Override
     public void setRequestResponse(HttpRequestResponse requestResponse) {
         this.requestResponse = requestResponse;
-        this.requestEditor.setContents(ByteArray.byteArray(requestResponse.response().bodyToString()));
+        Object comboBoxObj = messageTypeComboBox.getSelectedItem();
+        if(Objects.isNull(comboBoxObj)) {
+            requestEditor.setContents(ByteArray.byteArray(requestResponse.response().bodyToString()));
+
+        } else { // comboBox で選択されているメッセージタイプでデコードする
+            Descriptor descriptor = messageTypes.get(comboBoxObj);
+            try {
+                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
+                builder.mergeFrom(requestResponse.response().bodyToString().getBytes());
+
+                String json = Protobuffer.protobufToJson(builder.build());
+                requestEditor.setContents(ByteArray.byteArray(json));
+
+            } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
+                requestEditor.setContents(ByteArray.byteArray(requestResponse.response().bodyToString()));
+            }
+        }
     }
 
     @Override

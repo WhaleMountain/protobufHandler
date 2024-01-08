@@ -18,6 +18,7 @@ import javax.swing.filechooser.*;
 
 import java.util.List;
 import java.util.HashMap;
+import java.util.Objects;
 
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -81,7 +82,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestEditor.getContents().getBytes());
+                builder.mergeFrom(requestResponse.request().bodyToString().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setEditable(true);
@@ -132,8 +133,26 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
     @Override
     public void setRequestResponse(HttpRequestResponse requestResponse) {
         this.requestResponse = requestResponse;
-        this.requestEditor.setContents(ByteArray.byteArray(requestResponse.request().bodyToString()));
-        this.requestEditor.setEditable(false);
+        Object comboBoxObj = messageTypeComboBox.getSelectedItem();
+        if(Objects.isNull(comboBoxObj)) {
+            requestEditor.setContents(ByteArray.byteArray(requestResponse.request().bodyToString()));
+            requestEditor.setEditable(false);
+
+        } else { // comboBox で選択されているメッセージタイプでデコードする
+            Descriptor descriptor = messageTypes.get(comboBoxObj);
+            try {
+                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
+                builder.mergeFrom(requestResponse.request().bodyToString().getBytes());
+
+                String json = Protobuffer.protobufToJson(builder.build());
+                requestEditor.setEditable(true);
+                requestEditor.setContents(ByteArray.byteArray(json));
+
+            } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
+                requestEditor.setContents(ByteArray.byteArray(requestResponse.request().bodyToString()));
+                requestEditor.setEditable(false);
+            }
+        }
     }
 
     @Override
