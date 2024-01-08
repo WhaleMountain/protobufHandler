@@ -11,7 +11,8 @@ import protobufhandler.view.MainView;
 //Burp will auto-detect and load any class that extends BurpExtension.
 public class App implements BurpExtension {
     private final String extensionName = "Protobuf Handler";
-    private final String extensionVersion = "v0.0.1";
+    private final String editorCaption = "Protobuf to Json Decode";
+    private final String extensionVersion = "v0.0.2";
 
     @Override
     public void initialize(MontoyaApi api) {
@@ -24,7 +25,7 @@ public class App implements BurpExtension {
         AppHandler handler = new AppHandler(api, view.getHandlingRules());
         api.http().registerHttpHandler(handler);
 
-        AppEditorProvider editorProvider = new AppEditorProvider(api);
+        AppEditorProvider editorProvider = new AppEditorProvider(api, editorCaption);
         api.userInterface().registerHttpRequestEditorProvider(editorProvider.getRequestProvider());
         api.userInterface().registerHttpResponseEditorProvider(editorProvider.getResponseProvider());
 

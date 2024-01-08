@@ -25,14 +25,16 @@ import com.google.protobuf.Descriptors.Descriptor;
 
 public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor {
     private JPanel mainEditorPanel;
-    private final RawEditor requestEditor;
-    private HttpRequestResponse requestResponse;
     private JComboBox<String> messageTypeComboBox;
+    private HttpRequestResponse requestResponse;
     private HashMap<String, Descriptor> messageTypes;
+    private final RawEditor requestEditor;
+    private final String editorCaption;
     private final Logging logging;
 
-    public AppRequestEditorView(MontoyaApi api, EditorCreationContext creationContext) {
+    public AppRequestEditorView(MontoyaApi api, EditorCreationContext creationContext, String editorCaption) {
         logging = api.logging();
+        this.editorCaption = editorCaption;
 
         requestEditor = api.userInterface().createRawEditor();
         requestEditor.setEditable(false);
@@ -169,7 +171,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
 
     @Override
     public String caption() {
-        return AppEditorProvider.EDITOR_CAPTION;
+        return editorCaption;
     }
 
     @Override
