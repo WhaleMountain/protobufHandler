@@ -32,14 +32,18 @@ public class Protobuffer {
         FileDescriptorSet set = FileDescriptorSet.parseFrom(new BufferedInputStream(protoFis));
         protoFis.close();
 
-        ArrayList<FileDescriptor> dependenciesDescriptors = new ArrayList<FileDescriptor>();
+        List<Descriptor> descriptors = new ArrayList<Descriptor>();
+        List<FileDescriptor> dependenciesDescriptors = new ArrayList<FileDescriptor>();
         for(int i = 0; i < set.getFileCount(); i++) {
             FileDescriptor dependenciesDescriptor = FileDescriptor.buildFrom(set.getFile(i), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
+            descriptors.addAll(dependenciesDescriptor.getMessageTypes());
             dependenciesDescriptors.add(dependenciesDescriptor);
         }
 
-        FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(set.getFileCount() - 1), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
-
-        return fileDescriptor.getMessageTypes();
+        //FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(set.getFileCount() - 1), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
+        //descriptors.addAll(fileDescriptor.getMessageTypes());
+        //return fileDescriptor.getMessageTypes();
+        
+        return descriptors;
     }
 }
