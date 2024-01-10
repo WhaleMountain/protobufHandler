@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "protobuf-example/hello";
+
+package hello;
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}
