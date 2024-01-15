@@ -69,7 +69,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                     }
 
                 } catch(Exception e) {
-                    //logging.logToError(e);;
+                    logging.logToError(e);;
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                     logging.logToOutput("File: " + selectedPath);
                 }
@@ -84,14 +84,14 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.request().bodyToString().getBytes());
+                builder.mergeFrom(requestResponse.request().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setEditable(true);
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
-                //logging.logToError(e);
+                logging.logToError(e);
                 requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });
@@ -125,7 +125,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                 return request;
 
             } catch(Exception e) {
-                //logging.logToError(e);
+                logging.logToError(e);
                 logging.logToOutput("Protobuf メッセージへの変換に失敗しました。");
             }
         }
@@ -138,21 +138,21 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         this.requestResponse = requestResponse;
         Object comboBoxObj = messageTypeComboBox.getSelectedItem();
         if(Objects.isNull(comboBoxObj)) {
-            requestEditor.setContents(ByteArray.byteArray(requestResponse.request().bodyToString()));
+            requestEditor.setContents(requestResponse.request().body());
             requestEditor.setEditable(false);
 
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.request().bodyToString().getBytes());
+                builder.mergeFrom(requestResponse.request().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setEditable(true);
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
-                requestEditor.setContents(ByteArray.byteArray(requestResponse.request().bodyToString()));
+                requestEditor.setContents(requestResponse.request().body());
                 requestEditor.setEditable(false);
             }
         }

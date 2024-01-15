@@ -69,7 +69,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                     }
 
                 } catch(Exception e) {
-                    //logging.logToError(e);;
+                    logging.logToError(e);;
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                     logging.logToOutput("File: " + selectedPath);
                 }
@@ -84,13 +84,13 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.response().bodyToString().getBytes());
+                builder.mergeFrom(requestResponse.response().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
-                //logging.logToError(e);
+                logging.logToError(e);
                 requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });
@@ -122,19 +122,19 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         this.requestResponse = requestResponse;
         Object comboBoxObj = messageTypeComboBox.getSelectedItem();
         if(Objects.isNull(comboBoxObj)) {
-            requestEditor.setContents(ByteArray.byteArray(requestResponse.response().bodyToString()));
+            requestEditor.setContents(requestResponse.response().body());
 
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
             try {
                 DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.response().bodyToString().getBytes());
+                builder.mergeFrom(requestResponse.response().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
-                requestEditor.setContents(ByteArray.byteArray(requestResponse.response().bodyToString()));
+                requestEditor.setContents(requestResponse.response().body());
             }
         }
     }

@@ -57,6 +57,7 @@ public class AppHandler implements HttpHandler {
                 return RequestToBeSentAction.continueWith(request);
 
             } catch (Exception e) {
+                logging.logToError(e);
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
                 logging.logToOutput("Scope: " + rule.getScope());
                 logging.logToOutput("Message Type: " + rule.getDescriptor().getName());

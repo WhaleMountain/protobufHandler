@@ -82,7 +82,7 @@ public class MainView {
         protoChooser.setFileFilter(descFilter);
 
         // Scope Component
-        GridBagConstraints constraints = initializeConstraints();
+        GridBagConstraints constraints = baseConstraints();
         constraints.gridy = 1;
         itemFormPanel.add(scopeLabel, constraints);
         constraints.gridx = 1;
@@ -119,7 +119,7 @@ public class MainView {
         itemFormPanel.add(commentScrollPane, constraints);
 
         // Buttons Component
-        constraints = initializeConstraints();
+        constraints = baseConstraints();
         itemBtnPanel.add(itemNewBtn);
         itemBtnPanel.add(itemSaveBtn);
         itemBtnPanel.add(itemRemoveBtn);
@@ -197,6 +197,7 @@ public class MainView {
                     }
                     
                 } catch(Exception e) {
+                    logging.logToError(e);
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                     logging.logToOutput("File: " + selectedPath);
                 }
@@ -267,6 +268,7 @@ public class MainView {
                 }
 
             } catch(Exception e) {
+                logging.logToError(e);
                 logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                 logging.logToOutput("File: " + selectedProtoPathLabel.getText());
             }
@@ -327,13 +329,13 @@ public class MainView {
         return itemModel.getAll();
     }
 
-    private GridBagConstraints initializeConstraints() {
+    private GridBagConstraints baseConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets  = new Insets(10, 4, 2, 10);
-        constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.gridx   = 0;
-        constraints.gridy   = 0;
+        constraints.insets             = new Insets(10, 4, 2, 10);
+        constraints.anchor             = GridBagConstraints.NORTHWEST;
+        constraints.fill               = GridBagConstraints.HORIZONTAL;
+        constraints.gridx              = 0;
+        constraints.gridy              = 0;
         return constraints;
     }
 }
