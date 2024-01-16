@@ -92,7 +92,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
 
             } catch(Exception e) {
                 logging.logToError(e);
-                requestEditor.setContents(ByteArray.byteArray("Jsonへの変換に失敗しました。"));
+                requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });
 
