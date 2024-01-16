@@ -40,7 +40,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         requestEditor.setEditable(false);
 
         mainEditorPanel = new JPanel(new BorderLayout());
-        JLabel selectedProtoPathLabel = new JLabel("No File Chosen");
+        JLabel selectedProtoPathLabel = new JLabel("選択されていません");
         selectedProtoPathLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
         messageTypeComboBox = new JComboBox<String>();
@@ -92,7 +92,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
 
             } catch(Exception e) {
                 logging.logToError(e);
-                requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
+                requestEditor.setContents(ByteArray.byteArray("Jsonへの変換に失敗しました。"));
             }
         });
 

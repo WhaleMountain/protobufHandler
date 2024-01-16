@@ -39,7 +39,7 @@ public class MainView {
         JLabel protoDescLabel = new JLabel("Protobuf File");
         protoDescLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
-        JLabel selectedProtoPathLabel = new JLabel("No File Chosen");
+        JLabel selectedProtoPathLabel = new JLabel("選択されていません");
         selectedProtoPathLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
         JLabel commentLabel = new JLabel("Comment");
@@ -156,7 +156,7 @@ public class MainView {
                 // Setup view
                 scopeTextField.setText(item.getScope());
                 if(item.getProtoDescPath().isEmpty()) {
-                    selectedProtoPathLabel.setText("No File Chosen");
+                    selectedProtoPathLabel.setText("選択されていません");
                 } else {
                     selectedProtoPathLabel.setText(item.getProtoDescPath());
                 }
@@ -217,7 +217,7 @@ public class MainView {
             int selectedRow = itemTable.getSelectedRow();
             if (selectedRow < 0) { return; }
             // Proto file、 Scope が指定されていない場合は保存しない
-            if (selectedProtoPathLabel.getText().equals("No File Chosen")) {
+            if (selectedProtoPathLabel.getText().equals("選択されていません")) {
                 protoChooseBtn.requestFocus();
                 return;
             }
@@ -295,7 +295,7 @@ public class MainView {
                 messageTypeComboBox.removeAllItems();
                 scopeTextField.setText("");
                 commentTextArea.setText("");
-                selectedProtoPathLabel.setText("No File Chosen");
+                selectedProtoPathLabel.setText("選択されていません");
                 toolScopeRepeaterCheckBox.setSelected(false);
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
