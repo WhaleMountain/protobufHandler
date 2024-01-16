@@ -27,6 +27,7 @@ public class Protobuffer {
         return JsonFormat.printer().print(message);
     }
 
+    // descriptor_setからmessageTypeを取得する
     public static List<Descriptor> getMessageTypesFromProtoFile(String protoDescPath) throws IOException, Descriptors.DescriptorValidationException {
         FileInputStream protoFis = new FileInputStream(protoDescPath);
         FileDescriptorSet set = FileDescriptorSet.parseFrom(new BufferedInputStream(protoFis));
@@ -40,10 +41,6 @@ public class Protobuffer {
             dependenciesDescriptors.add(dependenciesDescriptor);
         }
 
-        //FileDescriptor fileDescriptor = FileDescriptor.buildFrom(set.getFile(set.getFileCount() - 1), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
-        //descriptors.addAll(fileDescriptor.getMessageTypes());
-        //return fileDescriptor.getMessageTypes();
-        
         return descriptors;
     }
 }
