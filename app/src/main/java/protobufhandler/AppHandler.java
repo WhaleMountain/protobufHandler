@@ -46,7 +46,7 @@ public class AppHandler implements HttpHandler {
             if(!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
             if(!requestToString.contains(rule.getScope())) {
                 logging.logToOutput("リクエストがスコープとマッチしませんでした。");
-                logging.logToOutput("Scope: " + rule.getScope());
+                logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
                 continue;
             }
 
@@ -57,10 +57,10 @@ public class AppHandler implements HttpHandler {
                 return RequestToBeSentAction.continueWith(request);
 
             } catch (Exception e) {
-                logging.logToError(e);
+                logging.logToError(e.getMessage());
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
-                logging.logToOutput("Scope: " + rule.getScope());
-                logging.logToOutput("Message Type: " + rule.getDescriptor().getName());
+                logging.logToOutput("Scope: %s".formatted(rule.getScope()));
+                logging.logToOutput("Message Type: %s\n".formatted(rule.getDescriptor().getName()));
             }
         }
 

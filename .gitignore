@@ -7,3 +7,4 @@ build
 .DS_Store
 burp
 example/**/hello/*.pb.go
+example/proto/hello.desc

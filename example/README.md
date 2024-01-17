@@ -5,6 +5,7 @@
 cd protobufHandler/example/
 protoc --proto_path=./proto --go_out=./server-go/hello --go_opt=paths=source_relative ./proto/*.proto
 protoc --proto_path=./proto --go_out=./client-go/hello --go_opt=paths=source_relative ./proto/*.proto
+protoc --descriptor_set_out=./hello.desc *.proto
 ```
 
 * server-go の実行

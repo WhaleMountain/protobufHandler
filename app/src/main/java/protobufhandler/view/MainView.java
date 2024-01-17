@@ -128,6 +128,7 @@ public class MainView {
 
         itemModel = new AppTableModel();
         JTable itemTable = new JTable(itemModel) {
+            // アイテムを選択した時の動作
             @Override
             public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend)
             {
@@ -166,7 +167,9 @@ public class MainView {
                 List<String> messageTypes = item.getCachedMessageTypes();
                 for(int i = 0; i < messageTypes.size(); i++) {
                     messageTypeComboBox.addItem(messageTypes.get(i));
-                    messageTypeComboBox.setSelectedIndex(i);
+                    if(messageTypes.get(i).equals(item.getDescriptor().getName())) {
+                        messageTypeComboBox.setSelectedIndex(i);
+                    }
                 }
 
                 for (String toolName : item.getToolScope()) {
@@ -197,9 +200,9 @@ public class MainView {
                     }
                     
                 } catch(Exception e) {
-                    logging.logToError(e);
+                    logging.logToError(e.getMessage());
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
-                    logging.logToOutput("File: " + selectedPath);
+                    logging.logToOutput("File: %s\n".formatted(selectedPath));
                 }
 
                 selectedProtoPathLabel.setText(selectedPath);
@@ -268,9 +271,9 @@ public class MainView {
                 }
 
             } catch(Exception e) {
-                logging.logToError(e);
+                logging.logToError(e.getMessage());
                 logging.logToOutput("Protobuf file の読み込みに失敗しました。");
-                logging.logToOutput("File: " + selectedProtoPathLabel.getText());
+                logging.logToOutput("File: %s\n".formatted(selectedProtoPathLabel.getText()));
             }
 
             itemModel.fireTableRowsUpdated(selectedRow, selectedRow);

@@ -69,9 +69,9 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                     }
 
                 } catch(Exception e) {
-                    logging.logToError(e);;
+                    logging.logToError(e.getMessage());
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
-                    logging.logToOutput("File: " + selectedPath);
+                    logging.logToOutput("File: %s\n".formatted(selectedPath));
                 }
 
                 jsonDecodeBtn.setEnabled(true);
@@ -91,7 +91,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
-                logging.logToError(e);
+                logging.logToError(e.getMessage());
                 requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });
@@ -125,8 +125,8 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                 return request;
 
             } catch(Exception e) {
-                logging.logToError(e);
-                logging.logToOutput("Protobuf メッセージへの変換に失敗しました。");
+                logging.logToError(e.getMessage());
+                logging.logToOutput("Protobuf メッセージへの変換に失敗しました。\n");
             }
         }
 
