@@ -1,18 +1,19 @@
 package protobufhandler.util;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.util.JsonFormat;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Protobuffer {
     // jsonをprotobufメッセージに変換する
@@ -20,6 +21,14 @@ public class Protobuffer {
         DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
         JsonFormat.parser().merge(json, builder);
         return builder.build();
+    }
+
+    // descriptorがない場合にdecode_rawの形で返す
+    public static String decodeRaw(byte[] message) throws InvalidProtocolBufferException {
+        UnknownFieldSet.Builder builder = UnknownFieldSet.newBuilder();
+        builder.mergeFrom(message);
+
+        return builder.build().toString();
     }
 
     // protobufメッセージをjsonに変換する

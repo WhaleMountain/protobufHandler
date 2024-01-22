@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Extension.MessageType;
 
 public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor {
     private JPanel mainEditorPanel;
@@ -138,8 +140,15 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         this.requestResponse = requestResponse;
         Object comboBoxObj = messageTypeComboBox.getSelectedItem();
         if(Objects.isNull(comboBoxObj)) {
-            requestEditor.setContents(requestResponse.request().body());
-            requestEditor.setEditable(false);
+            try {
+                String decodedBody = Protobuffer.decodeRaw(requestResponse.request().body().getBytes());
+                requestEditor.setContents(ByteArray.byteArray(decodedBody));
+                requestEditor.setEditable(false);
+
+            } catch (Exception e) {
+                requestEditor.setContents(requestResponse.request().body());
+                requestEditor.setEditable(false);
+            }
 
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
@@ -152,8 +161,15 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
-                requestEditor.setContents(requestResponse.request().body());
-                requestEditor.setEditable(false);
+                try {
+                    String decodedBody = Protobuffer.decodeRaw(requestResponse.request().body().getBytes());
+                    requestEditor.setContents(ByteArray.byteArray(decodedBody));
+                    requestEditor.setEditable(false);
+    
+                } catch (Exception err) {
+                    requestEditor.setContents(requestResponse.request().body());
+                    requestEditor.setEditable(false);
+                }
             }
         }
     }

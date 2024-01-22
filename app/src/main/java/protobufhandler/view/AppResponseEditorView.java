@@ -122,7 +122,13 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         this.requestResponse = requestResponse;
         Object comboBoxObj = messageTypeComboBox.getSelectedItem();
         if(Objects.isNull(comboBoxObj)) {
-            requestEditor.setContents(requestResponse.response().body());
+            try {
+                String decodedBody = Protobuffer.decodeRaw(requestResponse.response().body().getBytes());
+                requestEditor.setContents(ByteArray.byteArray(decodedBody));
+
+            } catch(Exception e) {
+                requestEditor.setContents(requestResponse.response().body());
+            }
 
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
@@ -134,7 +140,13 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                 requestEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
-                requestEditor.setContents(requestResponse.response().body());
+                try {
+                    String decodedBody = Protobuffer.decodeRaw(requestResponse.response().body().getBytes());
+                    requestEditor.setContents(ByteArray.byteArray(decodedBody));
+    
+                } catch(Exception err) {
+                    requestEditor.setContents(requestResponse.response().body());
+                }
             }
         }
     }
