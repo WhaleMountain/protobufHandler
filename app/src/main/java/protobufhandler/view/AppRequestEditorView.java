@@ -21,9 +21,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import com.google.protobuf.DynamicMessage;
-import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Extension.MessageType;
 
 public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor {
     private JPanel mainEditorPanel;
