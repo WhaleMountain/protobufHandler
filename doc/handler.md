@@ -24,4 +24,4 @@ Burp の Repeater、Intruder、Scanner、Extensions を通過するリクエス�
 
 ### 補足
 
-ActiveScan++ など拡張機能で追加した Scan リクエストは「Extensions」で送信されます。そのため、Scan で使用する場合は、Tool Scope に 「Scan」「Extensions」の2つにチェックを入れることをおすすめします。
+ActiveScan++ など拡張機能から送信される Scan リクエストは「Extensions」で送信されます。そのため、Scan で使用する場合は、Tool Scope に 「Scan」「Extensions」の2つにチェックを入れることをおすすめします。

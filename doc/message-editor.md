@@ -4,7 +4,7 @@ Burp のメッセージエディターに Protobuf メッセージを Json に�
 
 ## 手順
 
-1. サポートされている `Content-Type` の時、「Protobuf to Json Decode」タブが表示されます
+1. サポートしている `Content-Type` の時、「Protobuf to Json Decode」タブが表示されます
 1. Protobuf to Json Decode タブを選択すると Raw フォーマットで表示されます
 ![](./image/editor-raw.png)
 1. 「Choose」ボタンで descriptor_set_out で出力したファイルを選択します
@@ -22,7 +22,7 @@ Burp のメッセージエディターに Protobuf メッセージを Json に�
 1. Logger を表示すると、Protobuf に変換されていることを確認できます
 ![](./image/editor-log.png)
 
-### サポートされているContent-Type
+### サポートしているContent-Type
 
 ```
 application/x-protobuf
