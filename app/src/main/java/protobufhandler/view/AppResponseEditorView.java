@@ -28,7 +28,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
     private JComboBox<String> messageTypeComboBox;
     private HttpRequestResponse requestResponse;
     private HashMap<String, Descriptor> messageTypes;
-    private final RawEditor requestEditor;
+    private final RawEditor responseEditor;
     private final String editorCaption;
     private final Logging logging;
 
@@ -36,8 +36,8 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         logging = api.logging();
         this.editorCaption = editorCaption;
 
-        requestEditor = api.userInterface().createRawEditor();
-        requestEditor.setEditable(false);
+        responseEditor = api.userInterface().createRawEditor();
+        responseEditor.setEditable(false);
 
         mainEditorPanel = new JPanel(new BorderLayout());
         JLabel selectedProtoPathLabel = new JLabel("選択されていません");
@@ -87,11 +87,11 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                 builder.mergeFrom(requestResponse.response().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
-                requestEditor.setContents(ByteArray.byteArray(json));
+                responseEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
                 logging.logToError(e.getMessage());
-                requestEditor.setContents(ByteArray.byteArray("Failed to parse input."));
+                responseEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });
 
@@ -109,7 +109,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         protobufFormPanel.add(protoDecodePanel);
 
         mainEditorPanel.add(protobufFormPanel, BorderLayout.NORTH);
-        mainEditorPanel.add(requestEditor.uiComponent(), BorderLayout.CENTER);
+        mainEditorPanel.add(responseEditor.uiComponent(), BorderLayout.CENTER);
     }
 
     @Override
@@ -124,10 +124,10 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         if(Objects.isNull(comboBoxObj)) {
             try {
                 String decodedBody = Protobuffer.decodeRaw(requestResponse.response().body().getBytes());
-                requestEditor.setContents(ByteArray.byteArray(decodedBody));
+                responseEditor.setContents(ByteArray.byteArray(decodedBody));
 
             } catch(Exception e) {
-                requestEditor.setContents(requestResponse.response().body());
+                responseEditor.setContents(requestResponse.response().body());
             }
 
         } else { // comboBox で選択されているメッセージタイプでデコードする
@@ -137,15 +137,15 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                 builder.mergeFrom(requestResponse.response().body().getBytes());
 
                 String json = Protobuffer.protobufToJson(builder.build());
-                requestEditor.setContents(ByteArray.byteArray(json));
+                responseEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする
                 try {
                     String decodedBody = Protobuffer.decodeRaw(requestResponse.response().body().getBytes());
-                    requestEditor.setContents(ByteArray.byteArray(decodedBody));
+                    responseEditor.setContents(ByteArray.byteArray(decodedBody));
     
                 } catch(Exception err) {
-                    requestEditor.setContents(requestResponse.response().body());
+                    responseEditor.setContents(requestResponse.response().body());
                 }
             }
         }
@@ -176,11 +176,11 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
     @Override
     public Selection selectedData()
     {
-        return requestEditor.selection().get();
+        return responseEditor.selection().get();
     }
 
     @Override
     public boolean isModified() {
-        return requestEditor.isModified();
+        return responseEditor.isModified();
     }
 }
