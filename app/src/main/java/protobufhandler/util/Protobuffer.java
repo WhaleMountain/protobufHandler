@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -39,15 +40,17 @@ public class Protobuffer {
     // descriptor_setからmessageTypeを取得する
     public static List<Descriptor> getMessageTypesFromProtoFile(String protoDescPath) throws IOException, Descriptors.DescriptorValidationException {
         FileInputStream protoFis = new FileInputStream(protoDescPath);
-        FileDescriptorSet set = FileDescriptorSet.parseFrom(new BufferedInputStream(protoFis));
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(protoFis);
+        FileDescriptorSet set = FileDescriptorSet.parseFrom(bufferedInputStream);
         protoFis.close();
+        bufferedInputStream.close();
 
         List<Descriptor> descriptors = new ArrayList<Descriptor>();
         List<FileDescriptor> dependenciesDescriptors = new ArrayList<FileDescriptor>();
-        for(int i = 0; i < set.getFileCount(); i++) {
-            FileDescriptor dependenciesDescriptor = FileDescriptor.buildFrom(set.getFile(i), dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
-            descriptors.addAll(dependenciesDescriptor.getMessageTypes());
-            dependenciesDescriptors.add(dependenciesDescriptor);
+        for (FileDescriptorProto descriptorProto : set.getFileList()) {
+            FileDescriptor dependencieDescriptor = FileDescriptor.buildFrom(descriptorProto, dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
+            descriptors.addAll(dependencieDescriptor.getMessageTypes());
+            dependenciesDescriptors.add(dependencieDescriptor);
         }
 
         return descriptors;
