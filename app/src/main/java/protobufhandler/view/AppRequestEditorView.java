@@ -177,7 +177,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         HttpRequest request = requestResponse.request();
         try {
             String contentType = request.headerValue("Content-Type");
-            return AppEditorProvider.ENABLE_EDITOR_CONTENT_TYPE.contains(contentType);
+            return AppEditorProvider.ENABLE_EDITOR_CONTENT_TYPE.stream().anyMatch(ctype -> contentType.startsWith(ctype));
 
         } catch(Exception e) {
             return false;

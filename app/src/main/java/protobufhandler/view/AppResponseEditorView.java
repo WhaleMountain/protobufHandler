@@ -156,7 +156,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         HttpResponse response = requestResponse.response();
         try {
             String contentType = response.headerValue("Content-Type");
-            return AppEditorProvider.ENABLE_EDITOR_CONTENT_TYPE.contains(contentType);
+            return AppEditorProvider.ENABLE_EDITOR_CONTENT_TYPE.stream().anyMatch(ctype -> contentType.startsWith(ctype));
             
         } catch (Exception e) {
             return false;
