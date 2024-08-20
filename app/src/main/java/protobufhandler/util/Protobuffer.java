@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.HashMap;
 
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
@@ -53,6 +55,16 @@ public class Protobuffer {
             dependenciesDescriptors.add(dependencieDescriptor);
         }
 
-        return descriptors;
+        return sortMessageType(descriptors);
+    }
+
+    private static List<Descriptor> sortMessageType(List<Descriptor> descriptors) {
+        TreeMap<String, Descriptor> sortedTreeMap = new TreeMap<String, Descriptor>();
+        for(Descriptor descriptor : descriptors) {
+            sortedTreeMap.put(descriptor.getName(), descriptor);
+        }
+        List<Descriptor> sortedDescriptors = new ArrayList<Descriptor>(sortedTreeMap.values());
+
+        return sortedDescriptors;
     }
 }
