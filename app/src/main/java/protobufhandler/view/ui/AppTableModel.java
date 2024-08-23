@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AppTableModel extends AbstractTableModel {
-    private final String[] columns = {"Enabled", "Scope", "Tool Scope", "Message Type", "File",  "Comment"};
+    private final String[] columns = {"Enabled", "Scope", "Replace Scope", "Tool Scope", "Message Type", "File",  "Comment"};
     private final List<AppModel> items;
 
     public AppTableModel() {
@@ -40,14 +40,20 @@ public class AppTableModel extends AbstractTableModel {
             messageType = item.getDescriptor().getName();
         }
 
+        String replaceScope = "Response";
+        if(item.isReplaceIsRequest()) {
+            replaceScope = "Request";
+        }
+
         return switch (columnIndex)
                 {
                     case 0 -> item.isEnabled();
                     case 1 -> item.getScope();
-                    case 2 -> String.join(", ", item.getToolScope());
-                    case 3 -> messageType;
-                    case 4 -> item.getProtoDescPath();
-                    case 5 -> item.getComment();
+                    case 2 -> replaceScope;
+                    case 3 -> String.join(", ", item.getToolScope());
+                    case 4 -> messageType;
+                    case 5 -> item.getProtoDescPath();
+                    case 6 -> item.getComment();
                     default -> "";
                 };
     }

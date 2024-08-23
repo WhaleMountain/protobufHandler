@@ -23,6 +23,7 @@ public class AppModel {
     private Descriptor descriptor;
     private List<String> cachedMessageTypes;
     private List<String> toolScope;
+    private boolean replaceIsRequest; // true: Request, false: Response
     private String comment;
 
     public AppModel() {
@@ -32,6 +33,7 @@ public class AppModel {
         this.descriptor = null;
         this.cachedMessageTypes = new ArrayList<>();
         this.toolScope = new ArrayList<>();
+        this.replaceIsRequest = true;
         this.comment = "";
     }
 
@@ -57,6 +59,10 @@ public class AppModel {
 
     public List<String> getToolScope() {
         return toolScope;
+    }
+
+    public boolean isReplaceIsRequest() {
+        return replaceIsRequest;
     }
 
     public String getComment() {
@@ -94,6 +100,10 @@ public class AppModel {
         }
         
         this.toolScope.add(toolName);
+    }
+
+    public void setReplaceScope(boolean flag) { // true: Request, false: Responce
+        this.replaceIsRequest = flag;
     }
 
     public void setComment(String comment) {

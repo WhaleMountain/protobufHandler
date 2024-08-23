@@ -12,6 +12,8 @@ import burp.api.montoya.core.ToolType;
 import java.awt.*;
 import javax.swing.filechooser.*;
 
+import org.checkerframework.framework.qual.JavaExpression;
+
 import com.google.protobuf.Descriptors.Descriptor;
 
 import java.util.List;
@@ -41,6 +43,9 @@ public class MainView {
 
         JLabel selectedProtoPathLabel = new JLabel("選択されていません");
         selectedProtoPathLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+
+        JLabel replaceScopeLabel = new JLabel("Replace Scope");
+        replaceScopeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
         JLabel commentLabel = new JLabel("Comment");
         commentLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
@@ -81,6 +86,19 @@ public class MainView {
         FileFilter descFilter = new FileNameExtensionFilter("Proto Descriptor files (*.desc)", "desc");
         protoChooser.setFileFilter(descFilter);
 
+        JPanel replaceScopePanel = new JPanel();
+        ButtonGroup replaceScopeBtnGroup = new ButtonGroup();
+        JRadioButton replaceIsRequestBtn = new JRadioButton("Request", true);
+        JRadioButton replaceIsResponseBtn = new JRadioButton("Response");
+        replaceIsRequestBtn.setEnabled(false);
+        replaceIsResponseBtn.setEnabled(false);
+
+        replaceScopeBtnGroup.add(replaceIsRequestBtn);
+        replaceScopeBtnGroup.add(replaceIsResponseBtn);
+        
+        replaceScopePanel.add(replaceIsRequestBtn);
+        replaceScopePanel.add(replaceIsResponseBtn);
+
         // Scope Component
         GridBagConstraints constraints = baseConstraints();
         constraints.gridy = 1;
@@ -112,8 +130,14 @@ public class MainView {
         constraints.gridx = 1;
         itemFormPanel.add(toolScopePanel, constraints);
 
-        // Comment Component
+        // Replace Scope Component
         constraints.gridx = 0; constraints.gridy = 6;
+        itemFormPanel.add(replaceScopeLabel, constraints);
+        constraints.gridx = 1;
+        itemFormPanel.add(replaceScopePanel, constraints);
+
+        // Comment Component
+        constraints.gridx = 0; constraints.gridy = 8;
         itemFormPanel.add(commentLabel, constraints);
         constraints.gridx = 1;
         itemFormPanel.add(commentScrollPane, constraints);
@@ -153,6 +177,8 @@ public class MainView {
                 toolScopeIntruderCheckBox.setEnabled(true);
                 toolScopeScannerCheckBox.setEnabled(true);
                 toolScopeExtensionsCheckBox.setEnabled(true);
+                replaceIsRequestBtn.setEnabled(true);
+                replaceIsResponseBtn.setEnabled(true);
 
                 // Setup view
                 scopeTextField.setText(item.getScope());
@@ -182,6 +208,12 @@ public class MainView {
                     } else if (toolName == ToolType.EXTENSIONS.toolName()) {
                         toolScopeExtensionsCheckBox.setSelected(true);
                     }
+                }
+
+                if(item.isReplaceIsRequest()) {
+                    replaceScopeBtnGroup.setSelected(replaceIsRequestBtn.getModel(), true);
+                } else {
+                    replaceScopeBtnGroup.setSelected(replaceIsResponseBtn.getModel(), true);
                 }
 
                 super.changeSelection(rowIndex, columnIndex, toggle, extend);
@@ -258,6 +290,7 @@ public class MainView {
 
             item.setScope(scopeTextField.getText());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
+            item.setReplaceScope(replaceIsRequestBtn.isSelected());
             item.setComment(commentTextArea.getText());
 
             try {
@@ -303,6 +336,7 @@ public class MainView {
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
                 toolScopeExtensionsCheckBox.setSelected(false);
+                replaceScopeBtnGroup.setSelected(replaceIsRequestBtn.getModel(), true);
 
                 // Disable Component
                 scopeTextField.setEditable(false);
@@ -316,6 +350,8 @@ public class MainView {
                 toolScopeIntruderCheckBox.setEnabled(false);
                 toolScopeScannerCheckBox.setEnabled(false);
                 toolScopeExtensionsCheckBox.setEnabled(false);
+                replaceIsRequestBtn.setEnabled(false);
+                replaceIsResponseBtn.setEnabled(false);
             }
         });
 
