@@ -66,6 +66,10 @@ public class AppTableModel extends AbstractTableModel {
             case 0:
                 item.setEnabled(!item.isEnabled());
                 break;
+
+            case 6:
+                item.setComment((String)aValue);
+                break;
         
             default:
                 break;
@@ -76,6 +80,9 @@ public class AppTableModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int column) { 
         switch (column) {
             case 0:
+                return true;
+
+            case 6:
                 return true;
         
             default:

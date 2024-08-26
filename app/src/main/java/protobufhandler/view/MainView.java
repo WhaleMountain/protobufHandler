@@ -10,6 +10,8 @@ import protobufhandler.view.ui.AppTableModel;
 import burp.api.montoya.core.ToolType;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.filechooser.*;
 
 import com.google.protobuf.Descriptors.Descriptor;
@@ -45,16 +47,22 @@ public class MainView {
         JLabel replaceScopeLabel = new JLabel("Replace Scope");
         replaceScopeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
-        JLabel commentLabel = new JLabel("Comment");
-        commentLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        //JLabel commentLabel = new JLabel("Comment");
+        //commentLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+
+        JLabel responseBodyLabel = new JLabel("(Optional) Replaced Response Body");
+        responseBodyLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
 
         JTextField scopeTextField   = new JTextField(35);
-        JTextArea  commentTextArea  = new JTextArea(8, 1);
-        JScrollPane commentScrollPane = new JScrollPane(commentTextArea);
+        //JTextArea  commentTextArea  = new JTextArea(8, 1);
+        //JScrollPane commentScrollPane = new JScrollPane(commentTextArea);
+        JTextArea  responseBodyTextArea  = new JTextArea(8, 1);
+        JScrollPane responseBodyScrollPane = new JScrollPane(responseBodyTextArea);
         scopeTextField.setEditable(false);
         scopeTextField.setFocusable(false);
-        commentTextArea.setEnabled(false);
+        //commentTextArea.setEnabled(false);
+        responseBodyTextArea.setEnabled(false);
 
         JComboBox<String> messageTypeComboBox = new JComboBox<String>();
         messageTypeComboBox.setEnabled(false);
@@ -92,6 +100,8 @@ public class MainView {
         JRadioButton replaceIsResponseBtn = new JRadioButton("Response");
         replaceIsRequestBtn.setEnabled(false);
         replaceIsResponseBtn.setEnabled(false);
+        replaceIsRequestBtn.setText("Request");
+        replaceIsResponseBtn.setText("Response");
 
         replaceScopeBtnGroup.add(replaceIsRequestBtn);
         replaceScopeBtnGroup.add(replaceIsResponseBtn);
@@ -139,9 +149,11 @@ public class MainView {
 
         // Comment Component
         constraints.gridx = 0; constraints.gridy = 8;
-        itemFormPanel.add(commentLabel, constraints);
+        //itemFormPanel.add(commentLabel, constraints);
+        itemFormPanel.add(responseBodyLabel, constraints);
         constraints.gridx = 1;
-        itemFormPanel.add(commentScrollPane, constraints);
+        //itemFormPanel.add(commentScrollPane, constraints);
+        itemFormPanel.add(responseBodyScrollPane, constraints);
 
         // Buttons Component
         constraints = baseConstraints();
@@ -174,7 +186,7 @@ public class MainView {
                 messageTypeComboBox.setEnabled(true);
                 scopeTextField.setEditable(true);
                 scopeTextField.setFocusable(true);
-                commentTextArea.setEnabled(true);
+                //commentTextArea.setEnabled(true);
                 toolScopeProxyCheckBox.setEnabled(true);
                 toolScopeRepeaterCheckBox.setEnabled(true);
                 toolScopeIntruderCheckBox.setEnabled(true);
@@ -191,7 +203,8 @@ public class MainView {
                     selectedProtoPathLabel.setText(item.getProtoDescPath());
                 }
                 
-                commentTextArea.setText(item.getComment());
+                //commentTextArea.setText(item.getComment());
+                responseBodyTextArea.setText(item.getReplaceResponseBody());
 
                 List<String> messageTypes = item.getCachedMessageTypes();
                 for(int i = 0; i < messageTypes.size(); i++) {
@@ -215,10 +228,13 @@ public class MainView {
                     }
                 }
 
-                if(item.isReplaceIsRequest()) {
+                if(item.isReplaceIsRequest()) { // Requestを選択
                     replaceScopeBtnGroup.setSelected(replaceIsRequestBtn.getModel(), true);
-                } else {
+                    responseBodyTextArea.setEnabled(false);
+
+                } else { // Responseを選択
                     replaceScopeBtnGroup.setSelected(replaceIsResponseBtn.getModel(), true);
+                    responseBodyTextArea.setEnabled(true);
                 }
 
                 super.changeSelection(rowIndex, columnIndex, toggle, extend);
@@ -302,7 +318,10 @@ public class MainView {
             item.setScope(scopeTextField.getText());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
             item.setReplaceScope(replaceIsRequestBtn.isSelected());
-            item.setComment(commentTextArea.getText());
+            if(replaceIsResponseBtn.isSelected() && !responseBodyTextArea.getText().isBlank()) { // Replaceが選択されていて、何かしら値があるなら保存
+                item.setReplaceResponseBody(responseBodyTextArea.getText());
+            }
+            //item.setComment(commentTextArea.getText());
 
             try {
                 List<Descriptor> descriptors = Protobuffer.getMessageTypesFromProtoFile(selectedProtoPathLabel.getText());
@@ -323,6 +342,22 @@ public class MainView {
             itemModel.fireTableRowsUpdated(selectedRow, selectedRow);
         });
 
+        // ラジオボタンのイベント
+        ActionListener radioAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JRadioButton selecteRadioButton = (JRadioButton) e.getSource();
+                if(selecteRadioButton.getText().equals("Request")) {
+                    responseBodyTextArea.setEnabled(false);
+
+                } else if(selecteRadioButton.getText().equals("Response")) {
+                    responseBodyTextArea.setEnabled(true);
+                }
+            }
+        };
+        replaceIsRequestBtn.addActionListener(radioAction);
+        replaceIsResponseBtn.addActionListener(radioAction);
+
         // 選択したアイテムの削除
         itemRemoveBtn.addActionListener( e -> {
             int selectedRow = itemTable.getSelectedRow();
@@ -341,7 +376,8 @@ public class MainView {
                 // Clear view
                 messageTypeComboBox.removeAllItems();
                 scopeTextField.setText("");
-                commentTextArea.setText("");
+                //commentTextArea.setText("");
+                responseBodyTextArea.setText("");
                 selectedProtoPathLabel.setText("選択されていません");
                 toolScopeProxyCheckBox.setSelected(false);
                 toolScopeRepeaterCheckBox.setSelected(false);
@@ -353,7 +389,8 @@ public class MainView {
                 // Disable Component
                 scopeTextField.setEditable(false);
                 scopeTextField.setFocusable(false);
-                commentTextArea.setEnabled(false);
+                //commentTextArea.setEnabled(false);
+                responseBodyTextArea.setEnabled(false);
                 messageTypeComboBox.setEnabled(false);
                 itemSaveBtn.setEnabled(false);
                 itemRemoveBtn.setEnabled(false);

@@ -25,6 +25,7 @@ public class AppModel {
     private List<String> cachedMessageTypes;
     private List<String> toolScope;
     private boolean replaceIsRequest; // true: Request, false: Response
+    private String replaceResponseBody;
     private String comment;
 
     public AppModel() {
@@ -35,6 +36,7 @@ public class AppModel {
         this.cachedMessageTypes = new ArrayList<>();
         this.toolScope = new ArrayList<>();
         this.replaceIsRequest = true;
+        this.replaceResponseBody = "";
         this.comment = "";
     }
 
@@ -64,6 +66,10 @@ public class AppModel {
 
     public boolean isReplaceIsRequest() {
         return replaceIsRequest;
+    }
+
+    public String getReplaceResponseBody() {
+        return replaceResponseBody;
     }
 
     public String getComment() {
@@ -105,6 +111,10 @@ public class AppModel {
 
     public void setReplaceScope(boolean flag) { // true: Request, false: Responce
         this.replaceIsRequest = flag;
+    }
+
+    public void setReplaceResponseBody(String body) {
+        this.replaceResponseBody = body;
     }
 
     public void setComment(String comment) {
