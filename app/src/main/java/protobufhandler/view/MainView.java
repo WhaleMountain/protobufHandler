@@ -1,7 +1,5 @@
 package protobufhandler.view;
 
-import javax.swing.*;
-
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.logging.Logging;
 import protobufhandler.model.AppModel;
@@ -9,7 +7,25 @@ import protobufhandler.util.Protobuffer;
 import protobufhandler.view.ui.AppTableModel;
 import burp.api.montoya.core.ToolType;
 
-import java.awt.*;
+import javax.swing.JScrollPane;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTable;
+import javax.swing.ButtonGroup;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.filechooser.*;
@@ -47,21 +63,15 @@ public class MainView {
         JLabel replaceScopeLabel = new JLabel("Replace Scope");
         replaceScopeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
-        //JLabel commentLabel = new JLabel("Comment");
-        //commentLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
-
         JLabel responseBodyLabel = new JLabel("(Optional) Replaced Response Body");
         responseBodyLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
 
-        JTextField scopeTextField   = new JTextField(35);
-        //JTextArea  commentTextArea  = new JTextArea(8, 1);
-        //JScrollPane commentScrollPane = new JScrollPane(commentTextArea);
+        JTextField scopeTextField   = new JTextField(40);
         JTextArea  responseBodyTextArea  = new JTextArea(8, 1);
         JScrollPane responseBodyScrollPane = new JScrollPane(responseBodyTextArea);
         scopeTextField.setEditable(false);
         scopeTextField.setFocusable(false);
-        //commentTextArea.setEnabled(false);
         responseBodyTextArea.setEnabled(false);
 
         JComboBox<String> messageTypeComboBox = new JComboBox<String>();
@@ -147,12 +157,10 @@ public class MainView {
         constraints.gridx = 1;
         itemFormPanel.add(replaceScopePanel, constraints);
 
-        // Comment Component
+        // Optional Replace Response Body Component
         constraints.gridx = 0; constraints.gridy = 8;
-        //itemFormPanel.add(commentLabel, constraints);
         itemFormPanel.add(responseBodyLabel, constraints);
         constraints.gridx = 1;
-        //itemFormPanel.add(commentScrollPane, constraints);
         itemFormPanel.add(responseBodyScrollPane, constraints);
 
         // Buttons Component
@@ -186,7 +194,6 @@ public class MainView {
                 messageTypeComboBox.setEnabled(true);
                 scopeTextField.setEditable(true);
                 scopeTextField.setFocusable(true);
-                //commentTextArea.setEnabled(true);
                 toolScopeProxyCheckBox.setEnabled(true);
                 toolScopeRepeaterCheckBox.setEnabled(true);
                 toolScopeIntruderCheckBox.setEnabled(true);
@@ -203,7 +210,6 @@ public class MainView {
                     selectedProtoPathLabel.setText(item.getProtoDescPath());
                 }
                 
-                //commentTextArea.setText(item.getComment());
                 responseBodyTextArea.setText(item.getReplaceResponseBody());
 
                 List<String> messageTypes = item.getCachedMessageTypes();
@@ -318,10 +324,9 @@ public class MainView {
             item.setScope(scopeTextField.getText());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
             item.setReplaceScope(replaceIsRequestBtn.isSelected());
-            if(replaceIsResponseBtn.isSelected() && !responseBodyTextArea.getText().isBlank()) { // Replaceが選択されていて、何かしら値があるなら保存
+            if(replaceIsResponseBtn.isSelected()) { // Replaceが選択されているなら保存
                 item.setReplaceResponseBody(responseBodyTextArea.getText());
             }
-            //item.setComment(commentTextArea.getText());
 
             try {
                 List<Descriptor> descriptors = Protobuffer.getMessageTypesFromProtoFile(selectedProtoPathLabel.getText());
@@ -376,7 +381,6 @@ public class MainView {
                 // Clear view
                 messageTypeComboBox.removeAllItems();
                 scopeTextField.setText("");
-                //commentTextArea.setText("");
                 responseBodyTextArea.setText("");
                 selectedProtoPathLabel.setText("選択されていません");
                 toolScopeProxyCheckBox.setSelected(false);
@@ -389,7 +393,6 @@ public class MainView {
                 // Disable Component
                 scopeTextField.setEditable(false);
                 scopeTextField.setFocusable(false);
-                //commentTextArea.setEnabled(false);
                 responseBodyTextArea.setEnabled(false);
                 messageTypeComboBox.setEnabled(false);
                 itemSaveBtn.setEnabled(false);

@@ -49,6 +49,7 @@ public class AppHandler implements HttpHandler {
             if(!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
             if(!requestToString.contains(rule.getScope())) {
                 logging.logToOutput("リクエストがスコープとマッチしませんでした。");
+                logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
                 continue;
             }
@@ -62,6 +63,7 @@ public class AppHandler implements HttpHandler {
             } catch (Exception e) {
                 logging.logToError(e.getMessage());
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
+                logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s".formatted(rule.getScope()));
                 logging.logToOutput("Message Type: %s\n".formatted(rule.getDescriptor().getName()));
             }
@@ -83,19 +85,30 @@ public class AppHandler implements HttpHandler {
             if(!rule.getToolScope().contains(responseReceived.toolSource().toolType().toolName())) { continue; }
             if(!initiatingRequest.contains(rule.getScope(), false)) {
                 logging.logToOutput("ベースリクエストがスコープとマッチしませんでした。");
+                logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
                 continue;
             }
 
             try {
                 Descriptor descriptor = rule.getDescriptor();
-                DynamicMessage message = Protobuffer.jsonToProtobuf(new String(responseReceived.body().getBytes(), StandardCharsets.UTF_8), descriptor);
-                HttpResponse response = responseReceived.withBody(ByteArray.byteArray(message.toByteArray()));
+                HttpResponse response = responseReceived;
+
+                if(rule.getReplaceResponseBody().isBlank()) {
+                    DynamicMessage message = Protobuffer.jsonToProtobuf(new String(responseReceived.body().getBytes(), StandardCharsets.UTF_8), descriptor);
+                    response = responseReceived.withBody(ByteArray.byteArray(message.toByteArray()));
+
+                } else { // Optionalのレスポンスボディの書き換え。空じゃなかったら実行する
+                    DynamicMessage message = Protobuffer.jsonToProtobuf(rule.getReplaceResponseBody(), descriptor);
+                    response = responseReceived.withBody(ByteArray.byteArray(message.toByteArray()));
+                }
+                
                 return ResponseReceivedAction.continueWith(response);
 
             } catch (Exception e) {
                 logging.logToError(e.getMessage());
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
+                logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s".formatted(rule.getScope()));
                 logging.logToOutput("Message Type: %s\n".formatted(rule.getDescriptor().getName()));
             }
