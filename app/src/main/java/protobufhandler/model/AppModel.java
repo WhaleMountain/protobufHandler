@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 public class AppModel {
     public static final ToolType[] RULE_TARGE_TOOL_TYPE = {
+        ToolType.PROXY,
         ToolType.REPEATER,
         ToolType.INTRUDER,
         ToolType.SCANNER,

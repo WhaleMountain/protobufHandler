@@ -60,10 +60,12 @@ public class MainView {
         messageTypeComboBox.setEnabled(false);
 
         JPanel toolScopePanel                   = new JPanel();
+        JCheckBox toolScopeProxyCheckBox        = new JCheckBox("Proxy", false); 
         JCheckBox toolScopeRepeaterCheckBox     = new JCheckBox("Repeater", false); 
         JCheckBox toolScopeIntruderCheckBox     = new JCheckBox("Intruder", false);
         JCheckBox toolScopeScannerCheckBox      = new JCheckBox("Scanner", false);
         JCheckBox toolScopeExtensionsCheckBox   = new JCheckBox("Extensions", false);
+        toolScopeProxyCheckBox.setEnabled(false);
         toolScopeRepeaterCheckBox.setEnabled(false);
         toolScopeIntruderCheckBox.setEnabled(false);
         toolScopeScannerCheckBox.setEnabled(false);
@@ -121,6 +123,7 @@ public class MainView {
         // Tool Scope Component
         constraints.gridx = 0; constraints.gridy = 4;
         itemFormPanel.add(toolScopeLabel, constraints);
+        toolScopePanel.add(toolScopeProxyCheckBox);
         toolScopePanel.add(toolScopeRepeaterCheckBox);
         toolScopePanel.add(toolScopeIntruderCheckBox);
         toolScopePanel.add(toolScopeScannerCheckBox);
@@ -158,6 +161,7 @@ public class MainView {
 
                 // Clear view
                 messageTypeComboBox.removeAllItems();
+                toolScopeProxyCheckBox.setSelected(false);
                 toolScopeRepeaterCheckBox.setSelected(false);
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
@@ -171,6 +175,7 @@ public class MainView {
                 scopeTextField.setEditable(true);
                 scopeTextField.setFocusable(true);
                 commentTextArea.setEnabled(true);
+                toolScopeProxyCheckBox.setEnabled(true);
                 toolScopeRepeaterCheckBox.setEnabled(true);
                 toolScopeIntruderCheckBox.setEnabled(true);
                 toolScopeScannerCheckBox.setEnabled(true);
@@ -197,7 +202,9 @@ public class MainView {
                 }
 
                 for (String toolName : item.getToolScope()) {
-                    if (toolName == ToolType.REPEATER.toolName()) {
+                    if (toolName == ToolType.PROXY.toolName()) {
+                        toolScopeProxyCheckBox.setSelected(true);
+                    } else if (toolName == ToolType.REPEATER.toolName()) {
                         toolScopeRepeaterCheckBox.setSelected(true);
                     } else if (toolName == ToolType.INTRUDER.toolName()) {
                         toolScopeIntruderCheckBox.setSelected(true);
@@ -262,6 +269,12 @@ public class MainView {
             AppModel item = itemModel.get(selectedRow);
             item.clearToolScope();
             item.clearCachedMessageType();
+
+            if(toolScopeProxyCheckBox.isSelected()) {
+                item.setToolScope(ToolType.PROXY.toolName());
+            } else {
+                item.removeToolScope(ToolType.PROXY.toolName());
+            }
 
             if(toolScopeRepeaterCheckBox.isSelected()) {
                 item.setToolScope(ToolType.REPEATER.toolName());
@@ -330,6 +343,7 @@ public class MainView {
                 scopeTextField.setText("");
                 commentTextArea.setText("");
                 selectedProtoPathLabel.setText("選択されていません");
+                toolScopeProxyCheckBox.setSelected(false);
                 toolScopeRepeaterCheckBox.setSelected(false);
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
@@ -344,6 +358,7 @@ public class MainView {
                 itemSaveBtn.setEnabled(false);
                 itemRemoveBtn.setEnabled(false);
                 protoChooseBtn.setEnabled(false);
+                toolScopeProxyCheckBox.setEnabled(false);
                 toolScopeRepeaterCheckBox.setEnabled(false);
                 toolScopeIntruderCheckBox.setEnabled(false);
                 toolScopeScannerCheckBox.setEnabled(false);
