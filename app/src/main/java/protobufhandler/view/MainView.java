@@ -12,8 +12,6 @@ import burp.api.montoya.core.ToolType;
 import java.awt.*;
 import javax.swing.filechooser.*;
 
-import org.checkerframework.framework.qual.JavaExpression;
-
 import com.google.protobuf.Descriptors.Descriptor;
 
 import java.util.List;

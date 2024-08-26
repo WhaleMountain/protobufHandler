@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Objects;
 
+import java.nio.charset.StandardCharsets;
+
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Descriptors.Descriptor;
 
@@ -119,7 +121,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             HttpRequest request = requestResponse.request();
             try {
-                DynamicMessage message = Protobuffer.jsonToProtobuf(requestEditor.getContents().toString(), descriptor);
+                DynamicMessage message = Protobuffer.jsonToProtobuf(new String(requestEditor.getContents().getBytes(), StandardCharsets.UTF_8), descriptor);
                 request = request.withBody(ByteArray.byteArray(message.toByteArray()));
 
                 return request;
