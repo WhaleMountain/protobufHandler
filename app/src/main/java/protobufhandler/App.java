@@ -12,7 +12,7 @@ import protobufhandler.view.MainView;
 public class App implements BurpExtension {
     private final String extensionName = "Protobuf Handler";
     private final String editorCaption = "Protobuf to Json Decode";
-    private final String extensionVersion = "v0.0.5";
+    private final String extensionVersion = "v0.0.6";
 
     @Override
     public void initialize(MontoyaApi api) {
