@@ -12,9 +12,21 @@ import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import protobufhandler.AppEditorProvider;
 import protobufhandler.util.Protobuffer;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JFileChooser;
+import javax.swing.BoxLayout;
+
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.util.List;
 import java.util.HashMap;
@@ -48,9 +60,11 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         messageTypeComboBox = new JComboBox<String>();
         messageTypeComboBox.setEnabled(false);
 
-        JButton protoChooseBtn   = new JButton("Choose");
+        JButton protoChooseBtn  = new JButton("Choose");
+        JButton resetBtn        = new JButton("Reset");
         JButton jsonDecodeBtn   = new JButton("Decode");
         jsonDecodeBtn.setEnabled(false);
+        resetBtn.setBackground(new Color(251, 180, 196));
 
         JFileChooser protoChooser = new JFileChooser();
         protoChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -82,6 +96,25 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
             }
         });
 
+        resetBtn.addActionListener(event -> {
+            // reset ui
+            jsonDecodeBtn.setEnabled(false);
+            messageTypeComboBox.removeAllItems();
+            messageTypeComboBox.setEnabled(false);
+            selectedProtoPathLabel.setText("選択されていません");
+
+            // set raw format
+            try {
+                String decodedBody = Protobuffer.decodeRaw(requestResponse.request().body().getBytes());
+                requestEditor.setContents(ByteArray.byteArray(decodedBody));
+                requestEditor.setEditable(false);
+
+            } catch (Exception e) {
+                requestEditor.setContents(requestResponse.request().body());
+                requestEditor.setEditable(false);
+            }
+        });
+
         jsonDecodeBtn.addActionListener( event -> {
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
@@ -101,6 +134,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         JPanel protoPathPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         protoPathPanel.add(selectedProtoPathLabel);
         protoPathPanel.add(protoChooseBtn);
+        protoPathPanel.add(resetBtn);
 
         JPanel protoDecodePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         protoDecodePanel.add(messageTypeComboBox);

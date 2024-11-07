@@ -4,9 +4,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JFileChooser;
+import javax.swing.BoxLayout;
+
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
@@ -46,9 +58,11 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         messageTypeComboBox = new JComboBox<String>();
         messageTypeComboBox.setEnabled(false);
 
-        JButton protoChooseBtn   = new JButton("Choose");
+        JButton protoChooseBtn  = new JButton("Choose");
+        JButton resetBtn        = new JButton("Reset");
         JButton jsonDecodeBtn   = new JButton("Decode");
         jsonDecodeBtn.setEnabled(false);
+        resetBtn.setBackground(new Color(251, 180, 196));
 
         JFileChooser protoChooser = new JFileChooser();
         protoChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -80,6 +94,23 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
             }
         });
 
+        resetBtn.addActionListener(event -> {
+            // reset ui
+            jsonDecodeBtn.setEnabled(false);
+            messageTypeComboBox.removeAllItems();
+            messageTypeComboBox.setEnabled(false);
+            selectedProtoPathLabel.setText("選択されていません");
+
+            // set raw format
+            try {
+                String decodedBody = Protobuffer.decodeRaw(requestResponse.response().body().getBytes());
+                responseEditor.setContents(ByteArray.byteArray(decodedBody));
+
+            } catch(Exception e) {
+                responseEditor.setContents(requestResponse.response().body());
+            }
+        });
+
         jsonDecodeBtn.addActionListener( event -> {
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
@@ -98,6 +129,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         JPanel protoPathPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         protoPathPanel.add(selectedProtoPathLabel);
         protoPathPanel.add(protoChooseBtn);
+        protoPathPanel.add(resetBtn);
 
         JPanel protoDecodePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         protoDecodePanel.add(messageTypeComboBox);
