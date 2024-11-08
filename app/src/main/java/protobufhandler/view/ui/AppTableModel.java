@@ -41,7 +41,7 @@ public class AppTableModel extends AbstractTableModel {
         }
 
         String replaceScope = "Response";
-        if(item.isReplaceIsRequest()) {
+        if(item.isRequestHandling()) {
             replaceScope = "Request";
         }
 

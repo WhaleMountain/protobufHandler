@@ -45,7 +45,7 @@ public class AppHandler implements HttpHandler {
 
         for (AppModel rule : handlingRules) {
             if(!rule.isEnabled()) { continue; }
-            if(!rule.isReplaceIsRequest()) { continue; }
+            if(!rule.isRequestHandling()) { continue; }
             if(!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
             if(!requestToString.contains(rule.getScope())) {
                 logging.logToOutput("リクエストがスコープとマッチしませんでした。");
@@ -81,7 +81,7 @@ public class AppHandler implements HttpHandler {
 
         for (AppModel rule : handlingRules) {
             if(!rule.isEnabled()) { continue; }
-            if(rule.isReplaceIsRequest()) { continue; }
+            if(rule.isRequestHandling()) { continue; }
             if(!rule.getToolScope().contains(responseReceived.toolSource().toolType().toolName())) { continue; }
             if(!initiatingRequest.contains(rule.getScope(), false)) {
                 logging.logToOutput("ベースリクエストがスコープとマッチしませんでした。");

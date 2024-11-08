@@ -106,18 +106,18 @@ public class MainView {
 
         JPanel replaceScopePanel = new JPanel();
         ButtonGroup replaceScopeBtnGroup = new ButtonGroup();
-        JRadioButton replaceIsRequestBtn = new JRadioButton("Request", true);
-        JRadioButton replaceIsResponseBtn = new JRadioButton("Response");
-        replaceIsRequestBtn.setEnabled(false);
-        replaceIsResponseBtn.setEnabled(false);
-        replaceIsRequestBtn.setText("Request");
-        replaceIsResponseBtn.setText("Response");
+        JRadioButton requestHandlingBtn = new JRadioButton("Request", true);
+        JRadioButton responseHandlingBtn = new JRadioButton("Response");
+        requestHandlingBtn.setEnabled(false);
+        responseHandlingBtn.setEnabled(false);
+        requestHandlingBtn.setText("Request");
+        responseHandlingBtn.setText("Response");
 
-        replaceScopeBtnGroup.add(replaceIsRequestBtn);
-        replaceScopeBtnGroup.add(replaceIsResponseBtn);
+        replaceScopeBtnGroup.add(requestHandlingBtn);
+        replaceScopeBtnGroup.add(responseHandlingBtn);
         
-        replaceScopePanel.add(replaceIsRequestBtn);
-        replaceScopePanel.add(replaceIsResponseBtn);
+        replaceScopePanel.add(requestHandlingBtn);
+        replaceScopePanel.add(responseHandlingBtn);
 
         // Scope Component
         GridBagConstraints constraints = baseConstraints();
@@ -199,8 +199,8 @@ public class MainView {
                 toolScopeIntruderCheckBox.setEnabled(true);
                 toolScopeScannerCheckBox.setEnabled(true);
                 toolScopeExtensionsCheckBox.setEnabled(true);
-                replaceIsRequestBtn.setEnabled(true);
-                replaceIsResponseBtn.setEnabled(true);
+                requestHandlingBtn.setEnabled(true);
+                responseHandlingBtn.setEnabled(true);
 
                 // Setup view
                 scopeTextField.setText(item.getScope());
@@ -234,12 +234,12 @@ public class MainView {
                     }
                 }
 
-                if(item.isReplaceIsRequest()) { // Requestを選択
-                    replaceScopeBtnGroup.setSelected(replaceIsRequestBtn.getModel(), true);
+                if(item.isRequestHandling()) { // Requestを選択
+                    replaceScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
                     responseBodyTextArea.setEnabled(false);
 
                 } else { // Responseを選択
-                    replaceScopeBtnGroup.setSelected(replaceIsResponseBtn.getModel(), true);
+                    replaceScopeBtnGroup.setSelected(responseHandlingBtn.getModel(), true);
                     responseBodyTextArea.setEnabled(true);
                 }
 
@@ -323,8 +323,8 @@ public class MainView {
 
             item.setScope(scopeTextField.getText());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
-            item.setReplaceScope(replaceIsRequestBtn.isSelected());
-            if(replaceIsResponseBtn.isSelected()) { // Replaceが選択されているなら保存
+            item.setRequestHandling(requestHandlingBtn.isSelected());
+            if(responseHandlingBtn.isSelected()) { // Replaceが選択されているなら保存
                 item.setReplaceResponseBody(responseBodyTextArea.getText());
             }
 
@@ -360,8 +360,8 @@ public class MainView {
                 }
             }
         };
-        replaceIsRequestBtn.addActionListener(radioAction);
-        replaceIsResponseBtn.addActionListener(radioAction);
+        requestHandlingBtn.addActionListener(radioAction);
+        responseHandlingBtn.addActionListener(radioAction);
 
         // 選択したアイテムの削除
         itemRemoveBtn.addActionListener( e -> {
@@ -388,7 +388,7 @@ public class MainView {
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
                 toolScopeExtensionsCheckBox.setSelected(false);
-                replaceScopeBtnGroup.setSelected(replaceIsRequestBtn.getModel(), true);
+                replaceScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
 
                 // Disable Component
                 scopeTextField.setEditable(false);
@@ -403,8 +403,8 @@ public class MainView {
                 toolScopeIntruderCheckBox.setEnabled(false);
                 toolScopeScannerCheckBox.setEnabled(false);
                 toolScopeExtensionsCheckBox.setEnabled(false);
-                replaceIsRequestBtn.setEnabled(false);
-                replaceIsResponseBtn.setEnabled(false);
+                requestHandlingBtn.setEnabled(false);
+                responseHandlingBtn.setEnabled(false);
             }
         });
 
