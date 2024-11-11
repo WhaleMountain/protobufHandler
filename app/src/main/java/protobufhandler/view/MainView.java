@@ -60,8 +60,8 @@ public class MainView {
         JLabel selectedProtoPathLabel = new JLabel("選択されていません");
         selectedProtoPathLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
-        JLabel replaceScopeLabel = new JLabel("Replace Scope");
-        replaceScopeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        JLabel handlingScopeLabel = new JLabel("Handling Scope");
+        handlingScopeLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
 
         JLabel responseBodyLabel = new JLabel("(Optional) Replaced Response Body");
         responseBodyLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
@@ -104,8 +104,8 @@ public class MainView {
         FileFilter descFilter = new FileNameExtensionFilter("Proto Descriptor files (*.desc)", "desc");
         protoChooser.setFileFilter(descFilter);
 
-        JPanel replaceScopePanel = new JPanel();
-        ButtonGroup replaceScopeBtnGroup = new ButtonGroup();
+        JPanel handlingScopePanel = new JPanel();
+        ButtonGroup handlingScopeBtnGroup = new ButtonGroup();
         JRadioButton requestHandlingBtn = new JRadioButton("Request", true);
         JRadioButton responseHandlingBtn = new JRadioButton("Response");
         requestHandlingBtn.setEnabled(false);
@@ -113,11 +113,11 @@ public class MainView {
         requestHandlingBtn.setText("Request");
         responseHandlingBtn.setText("Response");
 
-        replaceScopeBtnGroup.add(requestHandlingBtn);
-        replaceScopeBtnGroup.add(responseHandlingBtn);
+        handlingScopeBtnGroup.add(requestHandlingBtn);
+        handlingScopeBtnGroup.add(responseHandlingBtn);
         
-        replaceScopePanel.add(requestHandlingBtn);
-        replaceScopePanel.add(responseHandlingBtn);
+        handlingScopePanel.add(requestHandlingBtn);
+        handlingScopePanel.add(responseHandlingBtn);
 
         // Scope Component
         GridBagConstraints constraints = baseConstraints();
@@ -151,11 +151,11 @@ public class MainView {
         constraints.gridx = 1;
         itemFormPanel.add(toolScopePanel, constraints);
 
-        // Replace Scope Component
+        // Handling Scope Component
         constraints.gridx = 0; constraints.gridy = 6;
-        itemFormPanel.add(replaceScopeLabel, constraints);
+        itemFormPanel.add(handlingScopeLabel, constraints);
         constraints.gridx = 1;
-        itemFormPanel.add(replaceScopePanel, constraints);
+        itemFormPanel.add(handlingScopePanel, constraints);
 
         // Optional Replace Response Body Component
         constraints.gridx = 0; constraints.gridy = 8;
@@ -235,11 +235,11 @@ public class MainView {
                 }
 
                 if(item.isRequestHandling()) { // Requestを選択
-                    replaceScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
+                    handlingScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
                     responseBodyTextArea.setEnabled(false);
 
                 } else { // Responseを選択
-                    replaceScopeBtnGroup.setSelected(responseHandlingBtn.getModel(), true);
+                    handlingScopeBtnGroup.setSelected(responseHandlingBtn.getModel(), true);
                     responseBodyTextArea.setEnabled(true);
                 }
 
@@ -388,7 +388,7 @@ public class MainView {
                 toolScopeIntruderCheckBox.setSelected(false);
                 toolScopeScannerCheckBox.setSelected(false);
                 toolScopeExtensionsCheckBox.setSelected(false);
-                replaceScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
+                handlingScopeBtnGroup.setSelected(requestHandlingBtn.getModel(), true);
 
                 // Disable Component
                 scopeTextField.setEditable(false);
