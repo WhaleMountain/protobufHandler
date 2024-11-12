@@ -12,13 +12,13 @@ Protobuf メッセージと Json を相互変換するための Burp 拡張機�
 
 ## Handler
 
-Burp の Repeater、Intruder、Scanner、Extensions を通過するリクエストに対して、Json から Protobuf メッセージへの変換を行います。
+Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエストに対して、Json から Protobuf メッセージへの変換を行います。
 
 * [使い方](doc/handler.md)
 
 ## Message Editor
 
-Burp のメッセージエディターに Protobuf メッセージを Json に変換するタブを表示します。
+Burp のメッセージエディターに Protobuf メッセージと Json を相互変換するタブを表示します。
 
 * [使い方](doc/message-editor.md)
 

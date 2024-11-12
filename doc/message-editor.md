@@ -1,6 +1,6 @@
 # Message Editor
 
-Burp のメッセージエディターに Protobuf メッセージを Json に変換するタブを表示します。
+Burp のメッセージエディターに Protobuf メッセージと Json を相互変換するタブを表示します。
 
 ## 手順
 
@@ -29,3 +29,6 @@ application/x-protobuf
 application/protobuf
 application/grpc-web+proto
 ```
+
+> [!TIP]
+> Content-Type を追加したい場合は `AppEditorProvider.java:18` の `ENABLE_EDITOR_CONTENT_TYPE` に追加してビルドし直してください。
