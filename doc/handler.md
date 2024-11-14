@@ -1,6 +1,6 @@
 # Handler
 
-Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエストに対して、Json から Protobuf メッセージへの変換を行います。  
+Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエスト、レスポンスに対して Json から Protobuf メッセージへの変換を行います。  
 また、リクエスト、レスポンス両方の変換に対応しています。
 
 ## Request handling

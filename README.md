@@ -1,6 +1,6 @@
 # Protobuf Handler
 
-Protobuf メッセージと Json を相互変換するための Burp 拡張機能です。　　
+Protobuf メッセージと Json を相互変換するための Burp 拡張機能です。
 
 機能
 - Handler
@@ -12,7 +12,7 @@ Protobuf メッセージと Json を相互変換するための Burp 拡張機�
 
 ## Handler
 
-Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエストに対して、Json から Protobuf メッセージへの変換を行います。
+Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエスト、レスポンスに対して Json から Protobuf メッセージへの変換を行います。
 
 * [使い方](doc/handler.md)
 

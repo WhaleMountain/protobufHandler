@@ -28,10 +28,11 @@ dependencies {
     implementation 'net.portswigger.burp.extensions:montoya-api:2024.7'
 
     // Protobuf
-    implementation 'com.google.protobuf:protobuf-java:3.25.1'
+    // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
+    implementation 'com.google.protobuf:protobuf-java:4.28.3'
 
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util
-    implementation 'com.google.protobuf:protobuf-java-util:3.25.1'
+    implementation 'com.google.protobuf:protobuf-java-util:4.28.3'
 }
 
 application {
