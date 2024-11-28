@@ -2,6 +2,29 @@
 
 Burp のメッセージエディターに Protobuf メッセージと Json を相互変換するタブを表示します。
 
+## 事前準備
+
+1. [Protocol Buffer Compiler Installation](https://grpc.io/docs/protoc-installation/) を参考に適宜 `protoc` コマンドをインストールしてください。
+1. 拡張機能で読み込むための `Descriptor` ファイルを作成します
+```shell
+# 例
+$ cd protobufHandler/example/proto
+$ protoc --descriptor_set_out=./hello.desc *.proto
+$ ls
+hello.desc  hello.proto user.proto
+#  ↑これを作成する
+```
+> [!NOTE]
+> 拡張子は必ず .desc としてください。
+
+3. import ファイルが複数ある場合などは適宜 --proto_path オプションなどを追加してください。
+```shell
+#例
+$ protoc --proto_path=./protobuf/:. --descriptor_set_out=./hello.desc *.proto
+```
+
+作成した `.desc` ファイルを使って Protobuf メッセージの変換を行います。
+
 ## 手順
 
 1. サポートしている `Content-Type` の時、「Protobuf to Json Decode」タブが表示されます

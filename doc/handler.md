@@ -3,6 +3,29 @@
 Burp の Proxy、Repeater、Intruder、Scanner、Extensions を通過するリクエスト、レスポンスに対して Json から Protobuf メッセージへの変換を行います。  
 また、リクエスト、レスポンス両方の変換に対応しています。
 
+## 事前準備
+
+1. [Protocol Buffer Compiler Installation](https://grpc.io/docs/protoc-installation/) を参考に適宜 `protoc` コマンドをインストールしてください。
+1. 拡張機能で読み込むための `Descriptor` ファイルを作成します
+```shell
+# 例
+$ cd protobufHandler/example/proto
+$ protoc --descriptor_set_out=./hello.desc *.proto
+$ ls
+hello.desc  hello.proto user.proto
+#  ↑これを作成する
+```
+> [!NOTE]
+> 拡張子は必ず .desc としてください。
+
+3. import ファイルが複数ある場合などは適宜 --proto_path オプションなどを追加してください。
+```shell
+#例
+$ protoc --proto_path=./protobuf/:. --descriptor_set_out=./hello.desc *.proto
+```
+
+作成した `.desc` ファイルを使って Protobuf メッセージの変換を行います。
+
 ## Request handling
 
 1. 対象のリクエストを Burp の Target Scope に登録します
