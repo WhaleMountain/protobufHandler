@@ -259,7 +259,7 @@ public class MainView {
                     }
                     
                 } catch(Exception e) {
-                    logging.logToError(e.getMessage());
+                    logging.logToError(e);
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                     logging.logToOutput("File: %s\n".formatted(selectedPath));
                 }
@@ -339,7 +339,7 @@ public class MainView {
                 }
 
             } catch(Exception e) {
-                logging.logToError(e.getMessage());
+                logging.logToError(e);
                 logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                 logging.logToOutput("File: %s\n".formatted(selectedProtoPathLabel.getText()));
             }

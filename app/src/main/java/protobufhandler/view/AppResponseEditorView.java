@@ -83,7 +83,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                     }
 
                 } catch(Exception e) {
-                    logging.logToError(e.getMessage());
+                    logging.logToError(e);
                     logging.logToOutput("Protobuf file の読み込みに失敗しました。");
                     logging.logToOutput("File: %s\n".formatted(selectedPath));
                 }
@@ -121,7 +121,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
                 responseEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
-                logging.logToError(e.getMessage());
+                logging.logToError(e);
                 responseEditor.setContents(ByteArray.byteArray("Failed to parse input."));
             }
         });

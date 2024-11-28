@@ -61,7 +61,7 @@ public class AppHandler implements HttpHandler {
                 return RequestToBeSentAction.continueWith(request);
 
             } catch (Exception e) {
-                logging.logToError(e.getMessage());
+                logging.logToError(e);
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
                 logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s".formatted(rule.getScope()));
@@ -106,7 +106,7 @@ public class AppHandler implements HttpHandler {
                 return ResponseReceivedAction.continueWith(response);
 
             } catch (Exception e) {
-                logging.logToError(e.getMessage());
+                logging.logToError(e);
                 logging.logToOutput("Protobufメッセージに変換することができませんでした。");
                 logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s".formatted(rule.getScope()));
