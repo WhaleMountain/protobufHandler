@@ -25,7 +25,7 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
 
     // Burp
-    implementation 'net.portswigger.burp.extensions:montoya-api:2024.7'
+    implementation 'net.portswigger.burp.extensions:montoya-api:2024.11'
 
     // Protobuf
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
