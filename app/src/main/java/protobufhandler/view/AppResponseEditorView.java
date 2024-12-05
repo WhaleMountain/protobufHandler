@@ -21,7 +21,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.DynamicMessage;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.ByteArray;
@@ -114,10 +113,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         jsonDecodeBtn.addActionListener( event -> {
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
-                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.response().body().getBytes());
-
-                String json = Protobuffer.protobufToJson(builder.build());
+                String json = Protobuffer.protobufToJson(requestResponse.response().body().getBytes(), descriptor);
                 responseEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) {
@@ -165,10 +161,7 @@ public class AppResponseEditorView implements ExtensionProvidedHttpResponseEdito
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
             try {
-                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.response().body().getBytes());
-
-                String json = Protobuffer.protobufToJson(builder.build());
+                String json = Protobuffer.protobufToJson(requestResponse.response().body().getBytes(), descriptor);
                 responseEditor.setContents(ByteArray.byteArray(json));
 
             } catch(Exception e) { // デコードに失敗したら、元のリクエストデータをセットする

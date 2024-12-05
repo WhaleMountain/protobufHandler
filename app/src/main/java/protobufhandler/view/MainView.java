@@ -28,7 +28,8 @@ import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.protobuf.Descriptors.Descriptor;
 

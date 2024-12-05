@@ -1,6 +1,6 @@
 package protobufhandler.view.ui;
 
-import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
 
 import protobufhandler.model.AppModel;
 

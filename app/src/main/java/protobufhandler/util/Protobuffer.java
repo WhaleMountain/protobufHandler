@@ -34,8 +34,10 @@ public class Protobuffer {
     }
 
     // protobufメッセージをjsonに変換する
-    public static String protobufToJson(DynamicMessage message) throws InvalidProtocolBufferException {
-        return JsonFormat.printer().print(message);
+    public static String protobufToJson(byte[] message, Descriptor descriptor) throws InvalidProtocolBufferException {
+        DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
+        builder.mergeFrom(message);
+        return JsonFormat.printer().print(builder.build());
     }
 
     // descriptor_setからmessageTypeを取得する

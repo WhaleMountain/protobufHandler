@@ -118,10 +118,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         jsonDecodeBtn.addActionListener( event -> {
             Descriptor descriptor = messageTypes.get(messageTypeComboBox.getSelectedItem());
             try {
-                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.request().body().getBytes());
-
-                String json = Protobuffer.protobufToJson(builder.build());
+                String json = Protobuffer.protobufToJson(requestResponse.request().body().getBytes(), descriptor);
                 requestEditor.setEditable(true);
                 requestEditor.setContents(ByteArray.byteArray(json));
 
@@ -187,10 +184,7 @@ public class AppRequestEditorView implements ExtensionProvidedHttpRequestEditor 
         } else { // comboBox で選択されているメッセージタイプでデコードする
             Descriptor descriptor = messageTypes.get(comboBoxObj);
             try {
-                DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
-                builder.mergeFrom(requestResponse.request().body().getBytes());
-
-                String json = Protobuffer.protobufToJson(builder.build());
+                String json = Protobuffer.protobufToJson(requestResponse.request().body().getBytes(), descriptor);
                 requestEditor.setEditable(true);
                 requestEditor.setContents(ByteArray.byteArray(json));
 
