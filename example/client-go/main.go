@@ -25,7 +25,7 @@ func sendHello() {
 	)
 
 	body := &pb.HelloRequest{
-		Name: "Taro",
+		Name: "test-user",
 	}
 
 	protobufBody, _ := proto.Marshal(body)
@@ -63,8 +63,8 @@ func sendUser() {
 	body := &pb.PostUserRequest{
 		User: &pb.User{
 			Id:    "1",
-			Name:  "Tanakaz",
-			Email: "tanakaz@example.com",
+			Name:  "TestUser1",
+			Email: "user1@example.com",
 		},
 	}
 

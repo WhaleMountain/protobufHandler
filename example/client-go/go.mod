@@ -2,4 +2,4 @@ module protobuf-example
 
 go 1.21.6
 
-require google.golang.org/protobuf v1.32.0
+require google.golang.org/protobuf v1.36.1
