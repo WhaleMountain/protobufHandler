@@ -222,15 +222,15 @@ public class MainView {
                 }
 
                 for (String toolName : item.getToolScope()) {
-                    if (toolName == ToolType.PROXY.toolName()) {
+                    if (toolName.equals(ToolType.PROXY.toolName())) {
                         toolScopeProxyCheckBox.setSelected(true);
-                    } else if (toolName == ToolType.REPEATER.toolName()) {
+                    } else if (toolName.equals(ToolType.REPEATER.toolName())) {
                         toolScopeRepeaterCheckBox.setSelected(true);
-                    } else if (toolName == ToolType.INTRUDER.toolName()) {
+                    } else if (toolName.equals(ToolType.INTRUDER.toolName())) {
                         toolScopeIntruderCheckBox.setSelected(true);
-                    } else if (toolName == ToolType.SCANNER.toolName()) {
+                    } else if (toolName.equals(ToolType.SCANNER.toolName())) {
                         toolScopeScannerCheckBox.setSelected(true);
-                    } else if (toolName == ToolType.EXTENSIONS.toolName()) {
+                    } else if (toolName.equals(ToolType.EXTENSIONS.toolName())) {
                         toolScopeExtensionsCheckBox.setSelected(true);
                     }
                 }
