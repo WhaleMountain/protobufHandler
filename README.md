@@ -22,6 +22,19 @@ Burp のメッセージエディターに Protobuf メッセージと Json を�
 
 * [使い方](doc/message-editor.md)
 
+## ビルド方法
+
+Gradleを使ってビルドしてください。
+
+```shell
+$ git clone https://github.com/WhaleMountain/protobufHandler.git
+$ cd protobufHandler
+$ ./gradlew build
+```
+
+バージョンを指定する場合は、`-Pversion=v1.0.0` オプションをつける。  
+`app/build/libs/protobufHandler.jar` が作成されます。これを Burp Suite で読み込みしてください。
+
 ## LICENSE
 
 MIT License. See [LICENSE](LICENSE)
