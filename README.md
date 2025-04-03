@@ -32,7 +32,6 @@ $ cd protobufHandler
 $ ./gradlew build
 ```
 
-バージョンを指定する場合は、`-Pversion=v1.0.0` オプションをつける。  
 `app/build/libs/protobufHandler.jar` が作成されます。これを Burp Suite で読み込みしてください。
 
 ## LICENSE
