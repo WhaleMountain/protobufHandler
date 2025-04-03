@@ -1,0 +1,60 @@
+name: Java CI/CD with Gradle
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Set Version
+      run: echo "PH_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew build -Pversion=${{ env.PH_VERSION }}
+
+    - name: Upload jar
+      uses: actions/upload-artifact@v4
+      with:
+        name: protobufHandler-jar
+        path: app/build/libs/protobufHandler-${{ env.PH_VERSION }}.jar
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Set Version
+      run: echo "PH_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+    - name: Download jar
+      uses: actions/download-artifact@v4
+      with:
+        name: protobufHandler-jar
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ env.PH_VERSION }} release
+        draft: true
+        prerelease: false
+        files: protobufHandler-${{ env.PH_VERSION }}.jar
