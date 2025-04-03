@@ -25,14 +25,14 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
 
     // Burp
-    implementation 'net.portswigger.burp.extensions:montoya-api:2024.11'
+    implementation 'net.portswigger.burp.extensions:montoya-api:2025.3'
 
     // Protobuf
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
-    implementation 'com.google.protobuf:protobuf-java:4.29.0'
+    implementation 'com.google.protobuf:protobuf-java:4.30.2'
 
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util
-    implementation 'com.google.protobuf:protobuf-java-util:4.29.0'
+    implementation 'com.google.protobuf:protobuf-java-util:4.30.2'
 }
 
 application {
@@ -41,7 +41,7 @@ application {
 }
 
 jar {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
