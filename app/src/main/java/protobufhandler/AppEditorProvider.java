@@ -20,6 +20,7 @@ public class AppEditorProvider {
             add("application/x-protobuf");
             add("application/protobuf");
             add("application/grpc-web+proto");
+            add("application/grpc");
         }
     };
 

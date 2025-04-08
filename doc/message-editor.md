@@ -51,6 +51,7 @@ $ protoc --proto_path=./protobuf/:. --descriptor_set_out=./hello.desc *.proto
 application/x-protobuf
 application/protobuf
 application/grpc-web+proto
+application/grpc
 ```
 
 > [!TIP]
