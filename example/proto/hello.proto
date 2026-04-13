@@ -24,6 +24,10 @@ message HelloUserReply {
   string message = 3;
 }
 
+message HelloUsersReply {
+  repeated hello.User users = 1;
+}
+
 message PostUserRequest {
   hello.User user = 1;
 }

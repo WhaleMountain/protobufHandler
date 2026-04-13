@@ -40,6 +40,7 @@ func main() {
 	e.POST("/hello", sayHello)
 	e.POST("/hello/user", sayHelloUser)
 	e.POST("/user", postUser)
+	e.GET("/users", helloUsers)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8000"))
@@ -102,6 +103,30 @@ func sayHelloUser(c echo.Context) error {
 		Status:  http.StatusOK,
 		User:    user,
 		Message: "",
+	}
+
+	log.Printf("SEND: %v", reply)
+
+	replyProto, _ := proto.Marshal(reply)
+
+	return c.Blob(http.StatusOK, "application/x-protobuf", replyProto)
+}
+
+// Handler
+func helloUsers(c echo.Context) error {
+	var users []*pb.User
+	for _, dbuser := range IN_MEMORY_USER_DB {
+		user := &pb.User{
+			Id:    dbuser.Id,
+			Name:  dbuser.Name,
+			Email: dbuser.Email,
+		}
+
+		users = append(users, user)
+	}
+
+	reply := &pb.HelloUsersReply{
+		Users: users,
 	}
 
 	log.Printf("SEND: %v", reply)

@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	sendHello()
-	//sendUser()
+	//sendHello()
+	sendUser()
 }
 
 func sendHello() {
