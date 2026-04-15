@@ -10,19 +10,17 @@ import protobufhandler.view.AppRequestEditorView;
 import protobufhandler.view.AppResponseEditorView;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class AppEditorProvider {
     private final MontoyaApi api;
     private final String editorCaption;
-    public static final List<String> ENABLE_EDITOR_CONTENT_TYPE = new ArrayList<String>() {
-        {
-            add("application/x-protobuf");
-            add("application/protobuf");
-            add("application/grpc-web+proto");
-            add("application/grpc");
-        }
-    };
+
+    public static final List<String> ENABLE_EDITOR_CONTENT_TYPE = List.of(
+            "application/x-protobuf",
+            "application/protobuf",
+            "application/grpc-web+proto",
+            "application/grpc"
+    );
 
     public AppEditorProvider(MontoyaApi api, String editorCaption) {
         this.api = api;

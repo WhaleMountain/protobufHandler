@@ -4,8 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.TreeMap;
 
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
@@ -29,7 +29,6 @@ public class Protobuffer {
     public static String decodeRaw(byte[] message) throws InvalidProtocolBufferException {
         UnknownFieldSet.Builder builder = UnknownFieldSet.newBuilder();
         builder.mergeFrom(message);
-
         return builder.build().toString();
     }
 
@@ -42,30 +41,23 @@ public class Protobuffer {
 
     // descriptor_setからmessageTypeを取得する
     public static List<Descriptor> getMessageTypesFromProtoFile(String protoDescPath) throws IOException, Descriptors.DescriptorValidationException {
-        FileInputStream protoFis = new FileInputStream(protoDescPath);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(protoFis);
-        FileDescriptorSet set = FileDescriptorSet.parseFrom(bufferedInputStream);
-        protoFis.close();
-        bufferedInputStream.close();
+        FileDescriptorSet set;
+        try (FileInputStream fis = new FileInputStream(protoDescPath);
+             BufferedInputStream bis = new BufferedInputStream(fis)) {
+            set = FileDescriptorSet.parseFrom(bis);
+        }
 
-        List<Descriptor> descriptors = new ArrayList<Descriptor>();
-        List<FileDescriptor> dependenciesDescriptors = new ArrayList<FileDescriptor>();
+        List<Descriptor> descriptors = new ArrayList<>();
+        List<FileDescriptor> dependencyDescriptors = new ArrayList<>();
         for (FileDescriptorProto descriptorProto : set.getFileList()) {
-            FileDescriptor dependencieDescriptor = FileDescriptor.buildFrom(descriptorProto, dependenciesDescriptors.toArray(new FileDescriptor[dependenciesDescriptors.size()]));
-            descriptors.addAll(dependencieDescriptor.getMessageTypes());
-            dependenciesDescriptors.add(dependencieDescriptor);
+            FileDescriptor fileDescriptor = FileDescriptor.buildFrom(
+                    descriptorProto,
+                    dependencyDescriptors.toArray(new FileDescriptor[0]));
+            descriptors.addAll(fileDescriptor.getMessageTypes());
+            dependencyDescriptors.add(fileDescriptor);
         }
 
-        return sortMessageType(descriptors);
-    }
-
-    private static List<Descriptor> sortMessageType(List<Descriptor> descriptors) {
-        TreeMap<String, Descriptor> sortedTreeMap = new TreeMap<String, Descriptor>();
-        for(Descriptor descriptor : descriptors) {
-            sortedTreeMap.put(descriptor.getName(), descriptor);
-        }
-        List<Descriptor> sortedDescriptors = new ArrayList<Descriptor>(sortedTreeMap.values());
-
-        return sortedDescriptors;
+        descriptors.sort(Comparator.comparing(Descriptor::getName));
+        return descriptors;
     }
 }
