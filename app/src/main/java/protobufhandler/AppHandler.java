@@ -30,7 +30,6 @@ public class AppHandler implements HttpHandler {
 
     @Override
     public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent requestToBeSent) {
-        // Protobuf Handler がサポートするツールか判定
         if (!requestToBeSent.toolSource().isFromTool(AppModel.RULE_TARGE_TOOL_TYPE)) {
             return RequestToBeSentAction.continueWith(requestToBeSent);
         }
@@ -44,15 +43,10 @@ public class AppHandler implements HttpHandler {
         String requestToString = headerToString.concat(bodyToString);
 
         for (AppModel rule : handlingRules) {
-            if(!rule.isEnabled()) { continue; }
-            if(!rule.isRequestHandling()) { continue; }
-            if(!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
-            if(!requestToString.contains(rule.getScope())) {
-                logging.logToOutput("リクエストがスコープとマッチしませんでした。");
-                logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
-                logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
-                continue;
-            }
+            if (!rule.isEnabled()) { continue; }
+            if (!rule.isRequestHandling()) { continue; }
+            if (!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
+            if (!requestToString.contains(rule.getScope())) { continue; }
 
             try {
                 Descriptor descriptor = rule.getDescriptor();
@@ -62,10 +56,8 @@ public class AppHandler implements HttpHandler {
 
             } catch (Exception e) {
                 logging.logToError(e);
-                logging.logToOutput("Protobufメッセージに変換することができませんでした。");
-                logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
-                logging.logToOutput("Scope: %s".formatted(rule.getScope()));
-                logging.logToOutput("Message Type: %s\n".formatted(rule.getDescriptor().getName()));
+                logging.logToOutput("Protobufメッセージに変換することができませんでした。 Request: %s, Scope: %s, Message Type: %s".formatted(
+                        requestToBeSent.pathWithoutQuery(), rule.getScope(), rule.getDescriptor().getName()));
             }
         }
 
@@ -75,42 +67,35 @@ public class AppHandler implements HttpHandler {
     @Override
     public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived responseReceived) {
         HttpRequest initiatingRequest = responseReceived.initiatingRequest();
-        if(!initiatingRequest.isInScope()) {
+        if (!initiatingRequest.isInScope()) {
             return ResponseReceivedAction.continueWith(responseReceived);
         }
 
         for (AppModel rule : handlingRules) {
-            if(!rule.isEnabled()) { continue; }
-            if(rule.isRequestHandling()) { continue; }
-            if(!rule.getToolScope().contains(responseReceived.toolSource().toolType().toolName())) { continue; }
-            if(!initiatingRequest.contains(rule.getScope(), false)) {
-                logging.logToOutput("ベースリクエストがスコープとマッチしませんでした。");
-                logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
-                logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
-                continue;
-            }
+            if (!rule.isEnabled()) { continue; }
+            if (rule.isRequestHandling()) { continue; }
+            if (!rule.getToolScope().contains(responseReceived.toolSource().toolType().toolName())) { continue; }
+            if (!initiatingRequest.contains(rule.getScope(), false)) { continue; }
 
             try {
                 Descriptor descriptor = rule.getDescriptor();
-                HttpResponse response = responseReceived;
+                HttpResponse response;
 
-                if(rule.getReplaceResponseBody().isBlank()) {
-                    DynamicMessage message = Protobuffer.jsonToProtobuf(new String(responseReceived.body().getBytes(), StandardCharsets.UTF_8), descriptor);
+                if (rule.getReplaceResponseBody().isBlank()) {
+                    DynamicMessage message = Protobuffer.jsonToProtobuf(
+                            new String(responseReceived.body().getBytes(), StandardCharsets.UTF_8), descriptor);
                     response = responseReceived.withBody(ByteArray.byteArray(message.toByteArray()));
-
-                } else { // Optionalのレスポンスボディの書き換え。空じゃなかったら実行する
+                } else {
                     DynamicMessage message = Protobuffer.jsonToProtobuf(rule.getReplaceResponseBody(), descriptor);
                     response = responseReceived.withBody(ByteArray.byteArray(message.toByteArray()));
                 }
-                
+
                 return ResponseReceivedAction.continueWith(response);
 
             } catch (Exception e) {
                 logging.logToError(e);
-                logging.logToOutput("Protobufメッセージに変換することができませんでした。");
-                logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
-                logging.logToOutput("Scope: %s".formatted(rule.getScope()));
-                logging.logToOutput("Message Type: %s\n".formatted(rule.getDescriptor().getName()));
+                logging.logToOutput("Protobufメッセージに変換することができませんでした。 Request: %s, Scope: %s, Message Type: %s".formatted(
+                        initiatingRequest.pathWithoutQuery(), rule.getScope(), rule.getDescriptor().getName()));
             }
         }
 

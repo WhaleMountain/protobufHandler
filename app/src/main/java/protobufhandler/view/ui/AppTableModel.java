@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AppTableModel extends AbstractTableModel {
-    private final String[] columns = {"Enabled", "Scope", "Replace Scope", "Tool Scope", "Message Type", "File",  "Comment"};
+    private final String[] columns = {"Enabled", "Scope", "Replace Scope", "Tool Scope", "Message Type", "File", "Comment"};
     private final List<AppModel> items;
 
     public AppTableModel() {
@@ -21,13 +21,12 @@ public class AppTableModel extends AbstractTableModel {
     }
 
     @Override
-    public synchronized int getRowCount()
-    {
+    public synchronized int getRowCount() {
         return items.size();
     }
 
     @Override
-    public int getColumnCount() { 
+    public int getColumnCount() {
         return columns.length;
     }
 
@@ -35,70 +34,36 @@ public class AppTableModel extends AbstractTableModel {
     public synchronized Object getValueAt(int rowIndex, int columnIndex) {
         AppModel item = items.get(rowIndex);
 
-        String messageType = "";
-        if(item.getDescriptor() != null) {
-            messageType = item.getDescriptor().getName();
-        }
-
-        String replaceScope = "Response";
-        if(item.isRequestHandling()) {
-            replaceScope = "Request";
-        }
-
-        return switch (columnIndex)
-                {
-                    case 0 -> item.isEnabled();
-                    case 1 -> item.getScope();
-                    case 2 -> replaceScope;
-                    case 3 -> String.join(", ", item.getToolScope());
-                    case 4 -> messageType;
-                    case 5 -> item.getProtoDescPath();
-                    case 6 -> item.getComment();
-                    default -> "";
-                };
+        return switch (columnIndex) {
+            case 0 -> item.isEnabled();
+            case 1 -> item.getScope();
+            case 2 -> item.isRequestHandling() ? "Request" : "Response";
+            case 3 -> String.join(", ", item.getToolScope());
+            case 4 -> item.getDescriptor() != null ? item.getDescriptor().getName() : "";
+            case 5 -> item.getProtoDescPath();
+            case 6 -> item.getComment();
+            default -> "";
+        };
     }
 
     @Override
     public synchronized void setValueAt(Object aValue, int row, int column) {
         AppModel item = items.get(row);
-
         switch (column) {
-            case 0:
-                item.setEnabled(!item.isEnabled());
-                break;
-
-            case 6:
-                item.setComment((String)aValue);
-                break;
-        
-            default:
-                break;
+            case 0 -> item.setEnabled(!item.isEnabled());
+            case 6 -> item.setComment((String) aValue);
+            default -> {}
         }
     }
 
     @Override
-    public boolean isCellEditable(int row, int column) { 
-        switch (column) {
-            case 0:
-                return true;
-
-            case 6:
-                return true;
-        
-            default:
-                return false;
-        }
+    public boolean isCellEditable(int row, int column) {
+        return column == 0 || column == 6;
     }
 
     @Override
     public Class<?> getColumnClass(int column) {
-        switch (column) {
-            case 0:
-                return Boolean.class;
-        
-            default:
-                return String.class;
-        }
+        return column == 0 ? Boolean.class : String.class;
     }
 
     public synchronized void add(AppModel item) {

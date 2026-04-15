@@ -134,7 +134,7 @@ public class AppModel {
     }
 
     public void clearToolScope() {
-        this.cachedMessageTypes.clear();
+        this.toolScope.clear();
     }
 
 }
