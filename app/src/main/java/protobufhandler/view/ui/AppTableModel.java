@@ -70,10 +70,12 @@ public class AppTableModel extends AbstractTableModel {
             case 6:
                 item.setComment((String)aValue);
                 break;
-        
+
             default:
-                break;
+                return;
         }
+
+        fireTableCellUpdated(row, column);
     }
 
     @Override

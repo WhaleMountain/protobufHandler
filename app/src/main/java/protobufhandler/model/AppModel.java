@@ -21,7 +21,8 @@ public class AppModel {
     private boolean enabled;
     private String scope;
     private String protoDescPath;
-    private Descriptor descriptor;
+    private String messageType; // 選択されたメッセージ型名 (descriptor の永続化用表現)
+    private transient Descriptor descriptor; // .desc から実行時に再構築するため永続化しない
     private List<String> cachedMessageTypes;
     private List<String> toolScope;
     private boolean requestHandling; // true: Request, false: Response
@@ -32,6 +33,7 @@ public class AppModel {
         this.enabled = false;
         this.scope = "";
         this.protoDescPath = "";
+        this.messageType = "";
         this.descriptor = null;
         this.cachedMessageTypes = new ArrayList<>();
         this.toolScope = new ArrayList<>();
@@ -50,6 +52,10 @@ public class AppModel {
 
     public String getProtoDescPath() {
         return protoDescPath;
+    }
+
+    public String getMessageType() {
+        return messageType;
     }
 
     public Descriptor getDescriptor() {
@@ -87,6 +93,10 @@ public class AppModel {
 
     public void setProtoDescPath(String path) {
         this.protoDescPath = path;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public void setDescriptor(Descriptor descriptor) {
@@ -134,7 +144,7 @@ public class AppModel {
     }
 
     public void clearToolScope() {
-        this.cachedMessageTypes.clear();
+        this.toolScope.clear();
     }
 
 }

@@ -2,8 +2,10 @@ package protobufhandler.view;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.logging.Logging;
+import burp.api.montoya.persistence.PersistedObject;
 import protobufhandler.model.AppModel;
 import protobufhandler.util.Protobuffer;
+import protobufhandler.util.SettingsStore;
 import protobufhandler.view.ui.AppTableModel;
 import burp.api.montoya.core.ToolType;
 
@@ -33,14 +35,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.google.protobuf.Descriptors.Descriptor;
 
+import java.io.File;
 import java.util.List;
 
 public class MainView {
     private JSplitPane mainPanel;
     private AppTableModel itemModel;
+    private final SettingsStore settingsStore;
+    private final PersistedObject persistedData;
 
     public MainView(MontoyaApi api) {
         Logging logging = api.logging();
+        settingsStore = new SettingsStore(logging);
+        persistedData = api.persistence().extensionData();
         mainPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainPanel.setDividerLocation(0.5);
         
@@ -94,6 +101,8 @@ public class MainView {
         JButton itemNewBtn       = new JButton("New");
         JButton itemSaveBtn      = new JButton("Save");
         JButton itemRemoveBtn    = new JButton("Remove");
+        JButton exportBtn        = new JButton("ファイルに保存");
+        JButton importBtn        = new JButton("ファイルから読み込む");
         JButton protoChooseBtn   = new JButton("Choose File");
 
         itemSaveBtn.setEnabled(false);
@@ -169,6 +178,8 @@ public class MainView {
         itemBtnPanel.add(itemNewBtn);
         itemBtnPanel.add(itemSaveBtn);
         itemBtnPanel.add(itemRemoveBtn);
+        itemBtnPanel.add(exportBtn);
+        itemBtnPanel.add(importBtn);
         constraints.gridx = 1;
         itemFormPanel.add(itemBtnPanel, constraints);
 
@@ -216,7 +227,7 @@ public class MainView {
                 List<String> messageTypes = item.getCachedMessageTypes();
                 for(int i = 0; i < messageTypes.size(); i++) {
                     messageTypeComboBox.addItem(messageTypes.get(i));
-                    if(messageTypes.get(i).equals(item.getDescriptor().getName())) {
+                    if(messageTypes.get(i).equals(item.getMessageType())) {
                         messageTypeComboBox.setSelectedIndex(i);
                     }
                 }
@@ -332,6 +343,7 @@ public class MainView {
             try {
                 List<Descriptor> descriptors = Protobuffer.getMessageTypesFromProtoFile(selectedProtoPathLabel.getText());
                 Object comboBoxObj = messageTypeComboBox.getSelectedItem();
+                item.setMessageType(String.valueOf(comboBoxObj));
                 for (Descriptor descriptor : descriptors) {
                     item.setCachedMessageType(descriptor.getName());
                     if(descriptor.getName().equals(String.valueOf(comboBoxObj))) {
@@ -408,6 +420,54 @@ public class MainView {
                 responseHandlingBtn.setEnabled(false);
             }
         });
+
+        // Export / Import (設定一覧全体をファイルへ保存 / から読み込む)
+        exportBtn.addActionListener( event -> {
+            JFileChooser jsonChooser = new JFileChooser();
+            jsonChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jsonChooser.setFileFilter(new FileNameExtensionFilter("JSON files (*.json)", "json"));
+            jsonChooser.setSelectedFile(new File("protobufhandler-settings.json"));
+            if (jsonChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                File file = jsonChooser.getSelectedFile();
+                if (!file.getName().toLowerCase().endsWith(".json")) {
+                    file = new File(file.getParentFile(), file.getName() + ".json");
+                }
+                try {
+                    settingsStore.exportToFile(file, itemModel.getAll());
+                    logging.logToOutput("設定をエクスポートしました: %s\n".formatted(file.getAbsolutePath()));
+                } catch (Exception e) {
+                    logging.logToError(e);
+                    logging.logToOutput("設定のエクスポートに失敗しました。\n");
+                }
+            }
+        });
+
+        importBtn.addActionListener( event -> {
+            JFileChooser jsonChooser = new JFileChooser();
+            jsonChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jsonChooser.setFileFilter(new FileNameExtensionFilter("JSON files (*.json)", "json"));
+            if (jsonChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                File file = jsonChooser.getSelectedFile();
+                try {
+                    List<AppModel> imported = settingsStore.importFromFile(file);
+                    for (AppModel rule : imported) {
+                        itemModel.add(rule);
+                    }
+                    logging.logToOutput("設定をインポートしました (%d 件追加): %s\n".formatted(imported.size(), file.getAbsolutePath()));
+                } catch (Exception e) {
+                    logging.logToError(e);
+                    logging.logToOutput("設定のインポートに失敗しました。\n");
+                }
+            }
+        });
+
+        // 起動時: プロジェクトファイルから復元 (自動保存リスナー登録より前に投入する)
+        for (AppModel rule : settingsStore.loadFromProject(persistedData)) {
+            itemModel.add(rule);
+        }
+
+        // 変更のたびにプロジェクトファイルへ自動保存
+        itemModel.addTableModelListener( event -> settingsStore.saveToProject(persistedData, itemModel.getAll()));
 
         JScrollPane itemTableScrollPane = new JScrollPane(itemTable);
         mainPanel.setLeftComponent(itemTableScrollPane);
