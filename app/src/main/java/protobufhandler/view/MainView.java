@@ -75,6 +75,9 @@ public class MainView {
         scopeTextField.setFocusable(false);
         responseBodyTextArea.setEnabled(false);
 
+        JCheckBox scopeRegexCheckBox = new JCheckBox("Regex", false);
+        scopeRegexCheckBox.setEnabled(false);
+
         JComboBox<String> messageTypeComboBox = new JComboBox<String>();
         messageTypeComboBox.setEnabled(false);
 
@@ -126,6 +129,8 @@ public class MainView {
         itemFormPanel.add(scopeLabel, constraints);
         constraints.gridx = 1;
         itemFormPanel.add(scopeTextField, constraints);
+        constraints.gridx = 2;
+        itemFormPanel.add(scopeRegexCheckBox, constraints);
 
         // Proto file Component
         constraints.gridx = 0; constraints.gridy = 2;
@@ -195,6 +200,7 @@ public class MainView {
                 messageTypeComboBox.setEnabled(true);
                 scopeTextField.setEditable(true);
                 scopeTextField.setFocusable(true);
+                scopeRegexCheckBox.setEnabled(true);
                 toolScopeProxyCheckBox.setEnabled(true);
                 toolScopeRepeaterCheckBox.setEnabled(true);
                 toolScopeIntruderCheckBox.setEnabled(true);
@@ -205,6 +211,7 @@ public class MainView {
 
                 // Setup view
                 scopeTextField.setText(item.getScope());
+                scopeRegexCheckBox.setSelected(item.isScopeRegex());
                 if(item.getProtoDescPath().isEmpty()) {
                     selectedProtoPathLabel.setText("選択されていません");
                 } else {
@@ -323,6 +330,7 @@ public class MainView {
             }
 
             item.setScope(scopeTextField.getText());
+            item.setScopeRegex(scopeRegexCheckBox.isSelected());
             item.setProtoDescPath(selectedProtoPathLabel.getText());
             item.setRequestHandling(requestHandlingBtn.isSelected());
             if(responseHandlingBtn.isSelected()) { // Replaceが選択されているなら保存
@@ -382,6 +390,7 @@ public class MainView {
                 // Clear view
                 messageTypeComboBox.removeAllItems();
                 scopeTextField.setText("");
+                scopeRegexCheckBox.setSelected(false);
                 responseBodyTextArea.setText("");
                 selectedProtoPathLabel.setText("選択されていません");
                 toolScopeProxyCheckBox.setSelected(false);
@@ -394,6 +403,7 @@ public class MainView {
                 // Disable Component
                 scopeTextField.setEditable(false);
                 scopeTextField.setFocusable(false);
+                scopeRegexCheckBox.setEnabled(false);
                 responseBodyTextArea.setEnabled(false);
                 messageTypeComboBox.setEnabled(false);
                 itemSaveBtn.setEnabled(false);

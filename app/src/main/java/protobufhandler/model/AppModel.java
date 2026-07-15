@@ -1,6 +1,8 @@
 package protobufhandler.model;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.google.protobuf.Descriptors.Descriptor;
 
@@ -20,6 +22,7 @@ public class AppModel {
 
     private boolean enabled;
     private String scope;
+    private boolean scopeRegex; // true: scope を正規表現として扱う
     private String protoDescPath;
     private Descriptor descriptor;
     private List<String> cachedMessageTypes;
@@ -28,9 +31,13 @@ public class AppModel {
     private String replaceResponseBody;
     private String comment;
 
+    private transient Pattern scopePattern; // scope をコンパイルした正規表現のキャッシュ
+    private transient boolean scopePatternComputed;
+
     public AppModel() {
         this.enabled = false;
         this.scope = "";
+        this.scopeRegex = false;
         this.protoDescPath = "";
         this.descriptor = null;
         this.cachedMessageTypes = new ArrayList<>();
@@ -46,6 +53,23 @@ public class AppModel {
 
     public String getScope() {
         return scope;
+    }
+
+    public boolean isScopeRegex() {
+        return scopeRegex;
+    }
+
+    // scope をコンパイルした正規表現を返す。不正な正規表現なら null（結果はキャッシュ）。
+    public Pattern getScopePattern() {
+        if (!scopePatternComputed) {
+            scopePatternComputed = true;
+            try {
+                scopePattern = Pattern.compile(scope);
+            } catch (PatternSyntaxException e) {
+                scopePattern = null;
+            }
+        }
+        return scopePattern;
     }
 
     public String getProtoDescPath() {
@@ -83,6 +107,12 @@ public class AppModel {
 
     public void setScope(String scope) {
         this.scope = scope;
+        this.scopePattern = null;          // scope 変更時は正規表現キャッシュを破棄
+        this.scopePatternComputed = false;
+    }
+
+    public void setScopeRegex(boolean flag) {
+        this.scopeRegex = flag;
     }
 
     public void setProtoDescPath(String path) {
