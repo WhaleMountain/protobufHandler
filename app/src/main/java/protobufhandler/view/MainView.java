@@ -16,12 +16,22 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTable;
 import javax.swing.ButtonGroup;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputFilter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -109,6 +119,16 @@ public class MainView {
         FileFilter descFilter = new FileNameExtensionFilter("Proto Descriptor files (*.desc)", "desc");
         protoChooser.setFileFilter(descFilter);
 
+        // ルール一覧の保存/読み込み用 FileChooser (*.pbh)
+        JFileChooser ruleFileChooser = new JFileChooser();
+        ruleFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileFilter ruleFilter = new FileNameExtensionFilter("Protobuf Handler files (*.pbh)", "pbh");
+        ruleFileChooser.setFileFilter(ruleFilter);
+
+        // ルール一覧の保存/読み込みボタン（New/Save/Remove と同じ行に並べる）
+        JButton exportBtn = new JButton("Export");
+        JButton importBtn = new JButton("Import");
+
         JPanel handlingScopePanel = new JPanel();
         ButtonGroup handlingScopeBtnGroup = new ButtonGroup();
         JRadioButton requestHandlingBtn = new JRadioButton("Request", true);
@@ -166,13 +186,20 @@ public class MainView {
         constraints.gridx = 0; constraints.gridy = 8;
         itemFormPanel.add(responseBodyLabel, constraints);
         constraints.gridx = 1;
+        // テキストエリアが縦に潰れないよう余白を吸収させる
+        constraints.fill    = GridBagConstraints.BOTH;
+        constraints.weighty = 1.0;
         itemFormPanel.add(responseBodyScrollPane, constraints);
+        constraints.weighty = 0;
+        constraints.fill    = GridBagConstraints.HORIZONTAL;
 
-        // Buttons Component
+        // Buttons Component (New / Save / Remove / Export / Import を1行に並べる)
         constraints = baseConstraints();
         itemBtnPanel.add(itemNewBtn);
         itemBtnPanel.add(itemSaveBtn);
         itemBtnPanel.add(itemRemoveBtn);
+        itemBtnPanel.add(exportBtn);
+        itemBtnPanel.add(importBtn);
         constraints.gridx = 1;
         itemFormPanel.add(itemBtnPanel, constraints);
 
@@ -414,6 +441,95 @@ public class MainView {
             }
         });
 
+        // ルール一覧をファイルに保存
+        exportBtn.addActionListener( event -> {
+            String saveFilePath = "";
+            if(ruleFileChooser.showSaveDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
+                File ruleSaveFile = ruleFileChooser.getSelectedFile();
+                // .pbh 拡張子をつける
+                if(!ruleSaveFile.getName().toLowerCase().endsWith(".pbh")) {
+                    ruleSaveFile = new File(ruleSaveFile.getAbsoluteFile() + ".pbh");
+                }
+
+                // ファイルが既に存在していたら確認する
+                if(ruleSaveFile.exists()) {
+                    int result = JOptionPane.showConfirmDialog(mainPanel, "ファイルが既に存在します。上書きしますか？", "Already exists", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    // NO が選択された場合は保存処理を中止
+                    if (result != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
+
+                // 保存パスの取得
+                saveFilePath = ruleSaveFile.getAbsolutePath();
+            } else {
+                return;
+            }
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFilePath))) {
+                oos.writeObject(new ArrayList<>(itemModel.getAll()));
+            } catch (IOException err) {
+                logging.logToError(err);
+                JOptionPane.showMessageDialog(mainPanel, "ファイルの保存に失敗しました。", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // ファイルからルール一覧を読み込み
+        importBtn.addActionListener( event -> {
+            String loadFilePath = "";
+            if(ruleFileChooser.showOpenDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
+                File ruleLoadFile = ruleFileChooser.getSelectedFile();
+                if(ruleLoadFile.isFile()) {
+                    loadFilePath = ruleLoadFile.getAbsolutePath();
+                } else {
+                    return;
+                }
+            } else {
+                return;
+            }
+
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(loadFilePath))) {
+                // 信頼できないファイルの読み込みによる任意コード実行を防ぐため、
+                // 復元を許可するクラスを AppModel と標準コレクション/文字列等に限定する。
+                ois.setObjectInputFilter(ObjectInputFilter.Config.createFilter(
+                    "protobufhandler.model.AppModel;java.util.*;java.lang.*;!*"));
+
+                Object obj = ois.readObject();
+                if(obj instanceof ArrayList<?> al) {
+                    // 参照先の Protobuf file (.desc) が存在しないルールを記録する
+                    List<String> missingProtoFiles = new ArrayList<>();
+                    for(Object element : al) {
+                        if(element instanceof AppModel item) {
+                            String protoPath = item.getProtoDescPath();
+                            if(protoPath != null && !protoPath.isBlank() && !new File(protoPath).isFile()) {
+                                // 参照先の .desc が存在しない → proto 情報をクリアして未選択状態に戻す
+                                if(!missingProtoFiles.contains(protoPath)) {
+                                    missingProtoFiles.add(protoPath);
+                                }
+                                item.setProtoDescPath("");
+                                item.clearCachedMessageType();
+                            } else {
+                                // descriptor は transient で復元されないため、proto ファイルから再構築する
+                                reconstructDescriptor(item, logging);
+                            }
+                            itemModel.add(item);
+                        }
+                    }
+
+                    // 見つからなかった Protobuf file があればユーザーに通知する
+                    if(!missingProtoFiles.isEmpty()) {
+                        String message = "以下の Protobuf file (.desc) が見つかりませんでした。\n"
+                                + "該当ルールの Message Type は復元されていません。\n\n"
+                                + String.join("\n", missingProtoFiles);
+                        JOptionPane.showMessageDialog(mainPanel, message, "Protobuf file not found", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            } catch (IOException | ClassNotFoundException err) {
+                logging.logToError(err);
+                JOptionPane.showMessageDialog(mainPanel, "ファイルの読み込みに失敗しました。", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         // ユーザープロジェクトに保存済みのルールを復元する
         for (AppModel item : projectStore.load()) {
             itemModel.add(item);
@@ -434,6 +550,29 @@ public class MainView {
 
     public List<AppModel> getHandlingRules() {
         return itemModel.getAll();
+    }
+
+    // 読み込んだ AppModel の descriptor を proto ファイルから再構築する。
+    // proto ファイルが無い / 該当 message type が見つからない場合は descriptor は null のまま。
+    private void reconstructDescriptor(AppModel item, Logging logging) {
+        String path = item.getProtoDescPath();
+        String name = item.getDescriptorName();
+        if (path == null || path.isBlank() || name == null || name.isBlank()) {
+            return;
+        }
+        try {
+            List<Descriptor> descriptors = Protobuffer.getMessageTypesFromProtoFile(path);
+            for (Descriptor descriptor : descriptors) {
+                if (descriptor.getName().equals(name)) {
+                    item.setDescriptor(descriptor);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            logging.logToError(e);
+            logging.logToOutput("Protobuf file の読み込みに失敗しました。");
+            logging.logToOutput("File: %s\n".formatted(path));
+        }
     }
 
     private GridBagConstraints baseConstraints() {
