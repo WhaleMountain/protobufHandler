@@ -1,6 +1,11 @@
 package protobufhandler.model;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -11,7 +16,9 @@ import burp.api.montoya.core.ToolType;
 
 import java.util.ArrayList;
 
-public class AppModel {
+public class AppModel implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final ToolType[] RULE_TARGE_TOOL_TYPE = {
         ToolType.PROXY,
         ToolType.REPEATER,
@@ -24,7 +31,10 @@ public class AppModel {
     private String scope;
     private boolean scopeRegex; // true: scope を正規表現として扱う
     private String protoDescPath;
-    private Descriptor descriptor;
+    // Descriptor は protobuf の型でシリアライズ不可なので transient にし、
+    // 選択中の message type 名を descriptorName に退避して保存する。
+    private transient Descriptor descriptor;
+    private String descriptorName;
     private List<String> cachedMessageTypes;
     private List<String> toolScope;
     private boolean requestHandling; // true: Request, false: Response
@@ -40,6 +50,7 @@ public class AppModel {
         this.scopeRegex = false;
         this.protoDescPath = "";
         this.descriptor = null;
+        this.descriptorName = "";
         this.cachedMessageTypes = new ArrayList<>();
         this.toolScope = new ArrayList<>();
         this.requestHandling = true;
@@ -78,6 +89,11 @@ public class AppModel {
 
     public Descriptor getDescriptor() {
         return descriptor;
+    }
+
+    // 保存時に退避された message type 名（読み込み後の descriptor 再構築に使う）
+    public String getDescriptorName() {
+        return descriptorName;
     }
 
     public List<String> getCachedMessageTypes() {
@@ -121,6 +137,10 @@ public class AppModel {
 
     public void setDescriptor(Descriptor descriptor) {
         this.descriptor = descriptor;
+        // 保存/ログ用に message type 名も同期しておく（descriptor は transient のため）
+        if (descriptor != null) {
+            this.descriptorName = descriptor.getName();
+        }
     }
 
     public void setCachedMessageType(String messageType) {
@@ -165,6 +185,23 @@ public class AppModel {
 
     public void clearToolScope() {
         this.cachedMessageTypes.clear();
+    }
+
+    // カスタムシリアライズ処理
+    // Descriptor は transient のため、選択中の message type 名だけを退避して保存する。
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        if (Objects.nonNull(this.descriptor)) {
+            this.descriptorName = this.descriptor.getName();
+        }
+        oos.defaultWriteObject();
+    }
+
+    // カスタムデシリアライズ処理
+    // descriptor 本体は proto ファイルから再構築する必要があるため、ここでは復元しない
+    // （読み込み側で protoDescPath と descriptorName を使って再構築する）。
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ois.defaultReadObject();
+        this.descriptor = null;
     }
 
 }
