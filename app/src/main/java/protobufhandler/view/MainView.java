@@ -2,8 +2,10 @@ package protobufhandler.view;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.logging.Logging;
+import burp.api.montoya.persistence.PersistedObject;
 import protobufhandler.model.AppModel;
 import protobufhandler.util.Protobuffer;
+import protobufhandler.util.ProjectStore;
 import protobufhandler.view.ui.AppTableModel;
 import burp.api.montoya.core.ToolType;
 
@@ -41,6 +43,8 @@ public class MainView {
 
     public MainView(MontoyaApi api) {
         Logging logging = api.logging();
+        // ルール一覧を Burp のユーザープロジェクトへ永続化するストア
+        ProjectStore projectStore = new ProjectStore(api.persistence().extensionData(), logging);
         mainPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         mainPanel.setDividerLocation(0.5);
         
@@ -216,7 +220,8 @@ public class MainView {
                 List<String> messageTypes = item.getCachedMessageTypes();
                 for(int i = 0; i < messageTypes.size(); i++) {
                     messageTypeComboBox.addItem(messageTypes.get(i));
-                    if(messageTypes.get(i).equals(item.getDescriptor().getName())) {
+                    // descriptor が未設定(null)のケースがあるため null ガードする
+                    if(item.getDescriptor() != null && messageTypes.get(i).equals(item.getDescriptor().getName())) {
                         messageTypeComboBox.setSelectedIndex(i);
                     }
                 }
@@ -408,6 +413,15 @@ public class MainView {
                 responseHandlingBtn.setEnabled(false);
             }
         });
+
+        // ユーザープロジェクトに保存済みのルールを復元する
+        for (AppModel item : projectStore.load()) {
+            itemModel.add(item);
+        }
+
+        // 以降のルール変更（追加/編集/削除/有効化トグル/コメント編集）を
+        // 自動でユーザープロジェクトへ保存する。
+        itemModel.addTableModelListener(event -> projectStore.save(itemModel.getAll()));
 
         JScrollPane itemTableScrollPane = new JScrollPane(itemTable);
         mainPanel.setLeftComponent(itemTableScrollPane);
