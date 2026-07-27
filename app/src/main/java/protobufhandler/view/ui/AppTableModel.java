@@ -70,10 +70,13 @@ public class AppTableModel extends AbstractTableModel {
             case 6:
                 item.setComment((String)aValue);
                 break;
-        
+
             default:
                 break;
         }
+
+        // 変更を通知し、登録済みリスナー（自動保存など）を発火させる
+        fireTableCellUpdated(row, column);
     }
 
     @Override
