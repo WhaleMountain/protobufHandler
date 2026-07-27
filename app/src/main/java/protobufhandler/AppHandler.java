@@ -1,6 +1,7 @@
 package protobufhandler;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.nio.charset.StandardCharsets;
 
 import com.google.protobuf.Descriptors.Descriptor;
@@ -47,7 +48,14 @@ public class AppHandler implements HttpHandler {
             if(!rule.isEnabled()) { continue; }
             if(!rule.isRequestHandling()) { continue; }
             if(!rule.getToolScope().contains(requestToBeSent.toolSource().toolType().toolName())) { continue; }
-            if(!requestToString.contains(rule.getScope())) {
+            boolean requestMatched;
+            if (rule.isScopeRegex()) {
+                Pattern pattern = rule.getScopePattern();
+                requestMatched = pattern != null && pattern.matcher(requestToString).find();
+            } else {
+                requestMatched = requestToString.contains(rule.getScope());
+            }
+            if(!requestMatched) {
                 logging.logToOutput("リクエストがスコープとマッチしませんでした。");
                 logging.logToOutput("Request: %s".formatted(requestToBeSent.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
@@ -83,7 +91,14 @@ public class AppHandler implements HttpHandler {
             if(!rule.isEnabled()) { continue; }
             if(rule.isRequestHandling()) { continue; }
             if(!rule.getToolScope().contains(responseReceived.toolSource().toolType().toolName())) { continue; }
-            if(!initiatingRequest.contains(rule.getScope(), false)) {
+            boolean responseMatched;
+            if (rule.isScopeRegex()) {
+                Pattern pattern = rule.getScopePattern();
+                responseMatched = pattern != null && initiatingRequest.contains(pattern);
+            } else {
+                responseMatched = initiatingRequest.contains(rule.getScope(), false);
+            }
+            if(!responseMatched) {
                 logging.logToOutput("ベースリクエストがスコープとマッチしませんでした。");
                 logging.logToOutput("Request: %s".formatted(initiatingRequest.pathWithoutQuery()));
                 logging.logToOutput("Scope: %s\n".formatted(rule.getScope()));
